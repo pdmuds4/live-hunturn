@@ -10,6 +10,8 @@ import type { LinksFunction } from "@remix-run/node";
 import "./assets/css/tailwind.css";
 import "./assets/css/global.css";
 
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+
 export const links: LinksFunction = () => [
   {
     rel: "icon",
@@ -46,6 +48,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+const theme = extendTheme({
+  fonts: {
+    body: "ReggaeOne, sans-serif",
+    heading: "ReggaeOne, sans-serif",
+  },
+});
+
 export default function App() {
-  return <Outlet />;
+  return (
+    <ChakraProvider theme={theme}>
+      <Outlet />
+    </ChakraProvider>
+  );
 }

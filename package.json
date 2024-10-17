@@ -11,9 +11,13 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.10.3",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
     "@remix-run/node": "^2.13.1",
     "@remix-run/react": "^2.13.1",
     "@remix-run/serve": "^2.13.1",
+    "framer-motion": "^11.11.9",
     "isbot": "^4.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
