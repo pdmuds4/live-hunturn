@@ -5,12 +5,22 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import type { LinksFunction } from "@remix-run/node";
+import type { LinksFunction, MetaFunction } from "@remix-run/node";
 
 import "./assets/css/tailwind.css";
 import "./assets/css/global.css";
 
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+
+export const meta: MetaFunction = () => {
+  return [
+      { title: "Live Hunturn" },
+      { 
+          name: "description", 
+          content: `モンスターハンター参加配信者用サービス。参加希望者の管理を表示できるインターフェイスを用意しています` 
+      },
+  ];
+};
 
 export const links: LinksFunction = () => [
   {
