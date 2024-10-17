@@ -1,6 +1,5 @@
 import { Text, Image } from "@chakra-ui/react";
-import { HomeLayout } from "~/src/components";
-import OriginalButton from "~/src/components/originalButton";
+import { HomeLayout, OriginalButton } from "~/src/components";
 
 export default function Login() {
     return (

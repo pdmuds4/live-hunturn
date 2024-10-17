@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 export default {
+  important: true,
   content: [
     './src/**/*.{js,jsx,ts,tsx}',
     "./app/**/{**,.client,.server}/**/*.{js,jsx,ts,tsx}"
