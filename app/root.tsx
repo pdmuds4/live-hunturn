@@ -7,9 +7,15 @@ import {
 } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
 
-import "./tailwind.css";
+import "./assets/css/tailwind.css";
+import "./assets/css/global.css";
 
 export const links: LinksFunction = () => [
+  {
+    rel: "icon",
+    href: "/favicon.svg",
+    type: "image/svg",
+  },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",

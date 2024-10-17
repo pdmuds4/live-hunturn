@@ -1,0 +1,11 @@
+html,
+body {
+    background-color: transparent;
+    overflow: hidden;
+    font-family: 'ReggaeOne', sans-serif;
+}
+
+@font-face {
+    font-family: 'ReggaeOne';
+    src: url('/ReggaeOne-Regular.ttf') format('opentype');
+}
