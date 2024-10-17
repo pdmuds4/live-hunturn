@@ -1,6 +1,6 @@
 import { Flex, Center } from "@chakra-ui/react";
 
-export default function HomeLayout(props: { children: React.ReactNode }) {
+export default function HomeLayout(props: React.PropsWithChildren) {
     return (
         <Center className="text-white bg-gradient-to-br from-red-500 to-orange-400 place-content-center">
             <Flex 

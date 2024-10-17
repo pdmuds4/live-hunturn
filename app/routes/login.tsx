@@ -1,5 +1,6 @@
-import { Text, Image, Button } from "@chakra-ui/react";
+import { Text, Image } from "@chakra-ui/react";
 import { HomeLayout } from "~/src/components";
+import OriginalButton from "~/src/components/originalButton";
 
 export default function Login() {
     return (
@@ -11,8 +12,7 @@ export default function Login() {
                 minW={100}
             />
             <Text fontSize='min(12vw, 32px)' as='ins'>Live Hunturn</Text>
-            <Button 
-                colorScheme='blackAlpha'
+            <OriginalButton 
                 leftIcon={
                     <Image 
                         src='https://cdn.icon-icons.com/icons2/2429/PNG/512/google_logo_icon_147282.png' 
@@ -22,7 +22,7 @@ export default function Login() {
                 }
             >
                 Login for Google
-            </Button>
+            </OriginalButton>
         </HomeLayout>
     );
 }
