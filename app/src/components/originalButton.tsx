@@ -2,7 +2,8 @@ import { Button, ButtonProps } from "@chakra-ui/react";
 import { useRef } from "react";
 
 type Props = ButtonProps & {
-    children: React.ReactNode
+    children: React.ReactNode,
+    onClick?: () => void
 }
 
 export default function OriginalButton(props: Props) {
@@ -13,7 +14,10 @@ export default function OriginalButton(props: Props) {
             <Button 
                 colorScheme='blackAlpha'
                 {...props}
-                onClick={()=>audioRef.current?.play()}
+                onClick={()=>{
+                    audioRef.current?.play()
+                    props.onClick && props.onClick()
+                }}
             >
                 {props.children}
             </Button>
