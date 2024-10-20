@@ -1,7 +1,8 @@
-import { LoaderFunctionArgs, json } from "@remix-run/node";
+import { LoaderFunctionArgs, TypedResponse, json } from "@remix-run/node";
 import apiHandler from "~/src/utils/apiHandler";
 import ServerError from "~/src/utils/serverError";
 
+import { GoogleUserApi } from "~/src/types";
 import axios from "axios";
 
 export const loader = (args: LoaderFunctionArgs) => apiHandler(
@@ -10,7 +11,8 @@ export const loader = (args: LoaderFunctionArgs) => apiHandler(
         const cookie = request.headers.get('cookie');
 
         if (cookie) {
-            const auth_info = await axios.get('/api.google-oauth', {
+            const domain = new URL(request.url).origin;
+            const auth_info = await axios.get(`${domain}/api/google-oauth`, {
                 headers: { cookie }
             });
 
@@ -22,7 +24,7 @@ export const loader = (args: LoaderFunctionArgs) => apiHandler(
                 }
             )
 
-            return json(user_info.data);
+            return json(user_info.data) as TypedResponse<GoogleUserApi.GETresponse>;
         } else {
             throw new ServerError(
                 'クッキーが見つかりませんでした',

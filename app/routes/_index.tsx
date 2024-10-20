@@ -1,12 +1,25 @@
-// import axios from "axios";
-// import { useEffect } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { Text, Box, Image, Stack, Icon } from "@chakra-ui/react";
 import { MdOutlineLiveTv } from "react-icons/md";
 
 import { ViewHomeLayout, UiButton, ProviderAuth } from "~/src/components";
+import { GoogleUserApi } from "~/src/types";
 
 
 export default function Index() {
+    const [userInfo, setUserInfo] = useState<GoogleUserApi.GETresponse|null>(null);
+
+    useEffect(() => {
+        axios.get('/api/google-user')
+        .then((res) => {
+            setUserInfo(res.data);
+        })
+        .catch((err) => {
+            console.error(err);
+        });
+    }, []);
+
     return (
         <ProviderAuth>
             <ViewHomeLayout>
@@ -15,14 +28,14 @@ export default function Index() {
                 </Text>
                 <Box className="text-center">
                     <Image 
-                        className="shadow-md"
-                        src='https://yt3.googleusercontent.com/ytc/AIdro_k-adfLoZx59Y62rNV58cop7fhtr4RK8K5YBORgORjDBVQ=s160-c-k-c0x00ffffff-no-rj'
+                        className="shadow-md cursor-pointer hover:opacity-80"
+                        src={userInfo?.picture}
                         alt="youtube account avatar"
                         maxW={100}
                         borderRadius='full'
                     />
                     <Text fontSize='min(8vw, 32px)'>
-                        PAM
+                        {userInfo?.name}
                     </Text>
                 </Box>
                 <Stack>
