@@ -1,10 +1,10 @@
 import { json, LoaderFunctionArgs, TypedResponse } from "@remix-run/node";
-import type { ExceptionResponse, GoogleOauth_GETresDTO } from "~/src/types";
+import type { ExceptionResponse, GoogleOauth } from "~/src/types";
 import ServerError from "~/src/utils/serverError";
 
 export const loader = async (
     { request } : LoaderFunctionArgs
-): Promise<TypedResponse<GoogleOauth_GETresDTO>|TypedResponse<ExceptionResponse>> => {
+): Promise<TypedResponse<GoogleOauth.GETresponseDTO>|TypedResponse<ExceptionResponse>> => {
     try {
         if (!process.env.GOOGLE_OAUTH_CLIENT_ID) throw new ServerError(
             'Google OAuthのクライアントIDがみつかりませんでした',

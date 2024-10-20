@@ -1,12 +1,12 @@
 import { ActionFunctionArgs, json, LoaderFunctionArgs, TypedResponse } from "@remix-run/node";
-import type { ExceptionResponse, GoogleCode_GETresDTO, GoogleCode_POSTreqDTO, GoogleCode_POSTresDTO } from "~/src/types";
+import type { ExceptionResponse, GoogleCode } from "~/src/types";
 import ServerError from "~/src/utils/serverError";
 
 import axios from "axios";
 
 export const loader = async (
     { request }: LoaderFunctionArgs
-): Promise<TypedResponse<GoogleCode_GETresDTO>|TypedResponse<ExceptionResponse>> => {
+): Promise<TypedResponse<GoogleCode.GETresponseDTO>|TypedResponse<ExceptionResponse>> => {
     try {
         const url = new URL(request.url);
         const oauth_code = url.searchParams.get('code');
@@ -37,11 +37,11 @@ export const loader = async (
 
 export const action = async (
     { request }: ActionFunctionArgs
-): Promise<TypedResponse<GoogleCode_POSTresDTO>|TypedResponse<ExceptionResponse>> => {
+): Promise<TypedResponse<GoogleCode.POSTresponseDTO>|TypedResponse<GoogleCode.DELETEresponseDTO>|TypedResponse<ExceptionResponse>> => {
     try {
         switch (request.method) {
             case 'POST': {
-                const payload = await request.json() as GoogleCode_POSTreqDTO;
+                const payload = await request.json() as GoogleCode.POSTrequestDTO;
                 const params = {
                     code:          payload.code,
                     client_id:     process.env.GOOGLE_OAUTH_CLIENT_ID,
@@ -52,14 +52,29 @@ export const action = async (
                 }
             
                 const response = await axios.post('https://oauth2.googleapis.com/token', params);
-                return json(response.data) as TypedResponse<GoogleCode_POSTresDTO>;
+                return json(response.data) as TypedResponse<GoogleCode.POSTresponseDTO>;
+            }
+            case 'DELETE': {
+                const payload = await request.json() as GoogleCode.DELETErequestDTO;
+                const params = {
+                    token: payload.access_token,
+                }
+                const response = await axios.get('https://accounts.google.com/o/oauth2/revoke', { params });
+                if (response.status !== 200) throw new ServerError(
+                    'ログアウトに失敗しました',
+                    'Failed to revoke token',
+                    request.url,
+                    400
+                );
+                return json({ message: response.data }) as TypedResponse<GoogleCode.DELETEresponseDTO>;
             }
             default: {
-                return json({
-                    message: '不正なリクエストです',
-                    detail: 'Only GET & POST requests are allowed',
-                    route: request.url,
-                }, { status: 404 });
+                throw new ServerError(
+                    '不正なリクエストです',
+                    'Only GET & POST requests are allowed',
+                    request.url,
+                    405
+                );
             }
         }
     } catch (error) {

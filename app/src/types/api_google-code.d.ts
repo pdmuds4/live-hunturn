@@ -2,6 +2,7 @@ export type GETresponseDTO = {
     code: string;
 }
 
+
 export type POSTrequestDTO = {
     code: string;
 }
@@ -12,4 +13,13 @@ export type POSTresponseDTO = {
     token_type: string;
     id_token: string;
     expires_in: number;
+}
+
+
+export type DELETErequestDTO = {
+    access_token: string;
+}
+
+export type DELETEresponseDTO = {
+    message: string;
 }
