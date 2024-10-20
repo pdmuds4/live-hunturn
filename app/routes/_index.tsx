@@ -1,22 +1,14 @@
 // import axios from "axios";
-import { useEffect } from "react";
+// import { useEffect } from "react";
 import { Text, Box, Image, Stack, Icon } from "@chakra-ui/react";
 import { MdOutlineLiveTv } from "react-icons/md";
 
-import { ViewHomeLayout, UiButton, useOauthInfo } from "~/src/components";
+import { ViewHomeLayout, UiButton, ProviderAuth } from "~/src/components";
 
 
 export default function Index() {
-    const auth_info = useOauthInfo();
-
-    useEffect(()=>{
-        if (auth_info) {
-            console.log(auth_info);
-        }
-    },[auth_info])
-
     return (
-        <>
+        <ProviderAuth>
             <ViewHomeLayout>
                 <Text fontSize='min(12vw, 32px)'>
                     Go Live !
@@ -41,6 +33,6 @@ export default function Index() {
                     </UiButton>
                 </Stack>
             </ViewHomeLayout>
-        </>
+        </ProviderAuth>
     );
 }
