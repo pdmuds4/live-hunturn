@@ -5,4 +5,4 @@ export type GoogleOauthDTO = {
     prompt: string;
     scope: string;
     token_type: string;
-};
+}

@@ -4,14 +4,15 @@ import { Text, Image } from "@chakra-ui/react";
 import { useGoogleLogin } from "@react-oauth/google";
 import { ViewHomeLayout, UiButton } from "~/src/components";
 
+import axios from "axios";
 
 export default function Login() {
-    const navigate = useNavigate()
-
+    const navigate = useNavigate();
     const loginHandler = useGoogleLogin({
         onSuccess: tokenResponse => {
-            localStorage.setItem('auth_info', JSON.stringify(tokenResponse))
-            navigate('/')
+            axios.post('/api/google-oauth', tokenResponse)
+            .then(() => navigate('/'))
+            .catch(err => console.log(err))
         },
         onError: error => console.log(error),
     })
