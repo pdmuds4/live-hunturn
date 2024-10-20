@@ -1,5 +1,5 @@
 import { Card, Flex } from "@chakra-ui/react";
-import { ProviderAuthInfo, ViewHunterRow } from "~/src/components";
+import { ViewHunterRow } from "~/src/components";
 
 const resouce = {
     hunter: {
@@ -12,7 +12,7 @@ const resouce = {
 
 export default function Live() {
     return (
-        <ProviderAuthInfo>
+        <>
             <Flex className="w-screen h-screen justify-center">
                 <Card className="relative w-full bg-slate-700/95" maxW='500px' minW="200px">
                     <Card className="w-full border-yellow-700 border-4 border-double bg-slate-950/95 text-white" h={132}>
@@ -28,6 +28,6 @@ export default function Live() {
                     </Flex>
                 </Card>
             </Flex>
-        </ProviderAuthInfo>
+        </>
     );
 }
