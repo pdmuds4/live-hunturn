@@ -11,6 +11,7 @@ import "./assets/css/tailwind.css";
 import "./assets/css/global.css";
 
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export const meta: MetaFunction = () => {
   return [
@@ -68,7 +69,9 @@ const theme = extendTheme({
 export default function App() {
   return (
     <ChakraProvider theme={theme}>
-      <Outlet />
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+        <Outlet />
+      </GoogleOAuthProvider>
     </ChakraProvider>
   );
 }
