@@ -14,8 +14,8 @@ export default function OriginalButton(props: Props) {
             <Button 
                 colorScheme='blackAlpha'
                 {...props}
-                onClick={()=>{
-                    audioRef.current?.play()
+                onClick={async()=>{
+                    await audioRef.current?.play()
                     props.onClick && props.onClick()
                 }}
             >

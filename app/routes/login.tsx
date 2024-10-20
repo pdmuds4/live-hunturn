@@ -1,7 +1,20 @@
+import { useFetcher } from "@remix-run/react";
+import { useEffect } from "react";
+
 import { Text, Image } from "@chakra-ui/react";
 import { HomeLayout, OriginalButton } from "~/src/components";
 
 export default function Login() {
+    const fetcher = useFetcher<{url: string}>();
+
+    const loginHandler = () => {
+        fetcher.load('/api/google-oauth')
+    }
+
+    useEffect(()=>{
+        if (fetcher.data) window.location.href = fetcher.data.url
+    }, [fetcher.data])
+
     return (
         <HomeLayout>
             <Image
@@ -19,6 +32,7 @@ export default function Login() {
                         boxSize={6} 
                     />
                 }
+                onClick={loginHandler}
             >
                 Login for Google
             </OriginalButton>
