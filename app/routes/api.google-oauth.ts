@@ -1,5 +1,5 @@
-import apiHandler from "~/src/utils/apiHandler";
 import { LoaderFunctionArgs, ActionFunctionArgs, json, createCookie, redirect } from "@remix-run/node";
+import apiHandler from "~/src/utils/apiHandler";
 import ServerError from "~/src/utils/serverError";
 
 import { GoogleOauthApi } from "~/src/types";

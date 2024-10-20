@@ -1,16 +1,18 @@
 // import axios from "axios";
-
+import { useEffect } from "react";
 import { Text, Box, Image, Stack, Icon } from "@chakra-ui/react";
 import { MdOutlineLiveTv } from "react-icons/md";
 
 import { ViewHomeLayout, UiButton, useOauthInfo } from "~/src/components";
-import { useEffect } from "react";
+
 
 export default function Index() {
     const auth_info = useOauthInfo();
 
     useEffect(()=>{
-        console.log(auth_info)
+        if (auth_info) {
+            console.log(auth_info);
+        }
     },[auth_info])
 
     return (
