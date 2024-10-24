@@ -18,18 +18,19 @@ export default function Index() {
         .then((res) => {
             setUserInfo(res.data);
         })
-        .catch((err) => {
-            console.error(err);
+        .catch(err => {
+            alert(err.response.data.replace('Unexpected Server Error\n\n', ''));
         });
     }, []);
 
     const liveConnectHandler = () => {
         axios.get(`/api/youtube-live?live_id=${liveID}`)
         .then(res => {
-            navigate(`/live?host=${res.data.channel_id}`);
+            console.log(res.data);
+            navigate(`/live?host=${res.data.chat_id}`);
         })
         .catch(err => {
-            console.error(err);
+            alert(err.response.data.replace('Unexpected Server Error\n\n', ''));
         });
     }
 

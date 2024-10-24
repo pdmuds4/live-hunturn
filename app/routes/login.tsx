@@ -12,7 +12,7 @@ export default function Login() {
         onSuccess: tokenResponse => {
             axios.post('/api/google-oauth', tokenResponse)
             .then(() => navigate('/'))
-            .catch(err => console.log(err))
+            .catch(err => alert(err.response.data.replace('Unexpected Server Error\n\n', '')))
         },
         onError: error => console.log(error),
     })
