@@ -7,17 +7,20 @@ export type GETresponse = {
 }
 
 export type POSTrequest = {
+    host_id: string;
     chat_id: string;
     page_token: string | null;
 }
 
 export type POSTresponse = {
-    latest_chat: {
-        id: string | null;
-        name: string | null;
-        avatar: string | null;
-        message: string | null;
-        timestamp: Date | null;
-    },
+    user_info?: {
+        id: string;
+        name: string;
+        avator: string;
+        message: string;
+        timestamp: Date;
+    }[],
+    user_names?: string[],
+    request: 'join' | 'leave' | 'rejoin',
     page_token: string | null;
 }

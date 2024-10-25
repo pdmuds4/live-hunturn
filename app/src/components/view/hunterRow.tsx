@@ -4,11 +4,11 @@ import { RiLiveFill } from "react-icons/ri";
 type Props = {
     hunter: {
         avator: string,
-        name: string,
+        name:   string,
     },
-    status: 'join-us' | 'stand-by' | 'just-leave',
-    quest: number,
-    is_owner: boolean,
+    status:   'join-us' | 'stand-by' | 'just-leave',
+    quest:    number,
+    is_owner: boolean
 }
 
 export default function HunterRow(props: Props) {

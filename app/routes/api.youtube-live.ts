@@ -5,9 +5,11 @@ import ServerError from "~/src/utils/serverError";
 import YoutubeClient from "~/src/client/youtube";
 import { YoutubeLiveApi } from "~/src/types";
 
-import { youtube_v3 } from "googleapis";
+import CommandProcessor from "~/src/client/command";
+import command_assets from "~/src/command";
 
 const client = new YoutubeClient(import.meta.env.VITE_YOUTUBE_API_KEY);
+const command = new CommandProcessor(command_assets);
 
 export const loader = (args: LoaderFunctionArgs) => apiHandler(
     args,
@@ -61,12 +63,11 @@ export const action = (args: ActionFunctionArgs) => apiHandler(
             case 'POST': {
                 const payload = await request.json() as YoutubeLiveApi.POSTrequest;
 
-                if (payload.chat_id) {
+                const requestToYoutube = async() => {
                     const response = await client.liveChatMessages.list(
                         {
                             liveChatId: payload.chat_id,
                             part: ['id', 'snippet', 'authorDetails'],
-                            //maxResults: 5,
                             pageToken: payload.page_token ? payload.page_token : undefined
                         }
                     );
@@ -75,15 +76,40 @@ export const action = (args: ActionFunctionArgs) => apiHandler(
                     const page_token = response.data.nextPageToken ? response.data.nextPageToken : '';
                     
                     if (chats && chats.length > 0) {
-                        const latest_chat = chats.at(-1) as youtube_v3.Schema$LiveChatMessage;
-                        const chat_info = {
-                            id:        latest_chat.authorDetails?.channelId       ? latest_chat.authorDetails.channelId       : null,
-                            name:      latest_chat.authorDetails?.displayName     ? latest_chat.authorDetails.displayName     : null,
-                            avator:    latest_chat.authorDetails?.profileImageUrl ? latest_chat.authorDetails.profileImageUrl : null,
-                            message:   latest_chat.snippet?.displayMessage        ? latest_chat.snippet.displayMessage        : null,
-                            timestamp: latest_chat.snippet?.publishedAt           ? new Date(latest_chat.snippet.publishedAt) : null,
-                        };
-                        return json({ latest_chat: chat_info, page_token });
+                        const latest5_chat = chats.slice(-5).reverse();
+                        
+                        // command check
+                        for (const chat of latest5_chat) {
+                            const chat_message = chat.snippet?.displayMessage as string;
+                            if (command.isCommand(chat_message)) {
+                                const { request, users } = command.process(chat_message);
+                                if (users) {
+                                    return json({
+                                        user_names: users,
+                                        request,
+                                        page_token
+                                    }) as TypedResponse<YoutubeLiveApi.POSTresponse>;
+                                } else {
+                                    const user_info = chat.authorDetails && chat.snippet ? {
+                                        id:        chat.authorDetails.channelId       ? chat.authorDetails.channelId       : null,
+                                        name:      chat.authorDetails.displayName     ? chat.authorDetails.displayName     : null,
+                                        avator:    chat.authorDetails.profileImageUrl ? chat.authorDetails.profileImageUrl : null,
+                                        message:   chat.snippet.displayMessage        ? chat.snippet.displayMessage        : null,
+                                        timestamp: chat.snippet.publishedAt           ? new Date(chat.snippet.publishedAt) : null,
+                                    }: undefined;
+
+                                    return json({
+                                        user_info,
+                                        request,
+                                        page_token
+                                    }) as TypedResponse<YoutubeLiveApi.POSTresponse>;
+                                }
+
+                            }
+                        }
+
+                        await new Promise((resolve) => setTimeout(resolve, 5000));
+                        return requestToYoutube();
                     } else {
                         throw new ServerError(
                             'チャットが見つかりませんでした',
@@ -92,6 +118,10 @@ export const action = (args: ActionFunctionArgs) => apiHandler(
                             404
                         )
                     }
+                }
+
+                if (payload.chat_id) {
+                    return requestToYoutube();
                 } else {
                     throw new ServerError(
                         'チャットIDが見つかりませんでした',
