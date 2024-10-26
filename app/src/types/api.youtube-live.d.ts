@@ -19,7 +19,7 @@ export type POSTresponse = {
         avator: string;
         message: string;
         timestamp: Date;
-    }[],
+    },
     user_names?: string[],
     request: 'join' | 'leave' | 'rejoin',
     page_token: string | null;

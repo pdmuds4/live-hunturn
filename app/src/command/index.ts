@@ -5,6 +5,7 @@ export default {
     // 退席
     "leave" : (args?: string[]) => ({ request: 'leave', users : args }),
 
+    // [!] 使わないかもしれない
     // 退席して参加希望
     "rejoin" : ()=> ({ request: 'rejoin'}),
 }

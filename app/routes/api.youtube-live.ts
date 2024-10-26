@@ -76,7 +76,7 @@ export const action = (args: ActionFunctionArgs) => apiHandler(
                     const page_token = response.data.nextPageToken ? response.data.nextPageToken : '';
                     
                     if (chats && chats.length > 0) {
-                        const latest5_chat = chats.slice(-5).reverse();
+                        const latest5_chat = chats.slice(-10).reverse();
                         
                         // command check
                         for (const chat of latest5_chat) {
@@ -107,17 +107,10 @@ export const action = (args: ActionFunctionArgs) => apiHandler(
 
                             }
                         }
-
-                        await new Promise((resolve) => setTimeout(resolve, 5000));
-                        return requestToYoutube();
-                    } else {
-                        throw new ServerError(
-                            'チャットが見つかりませんでした',
-                            'No chat found',
-                            request.url,
-                            404
-                        )
                     }
+
+                    await new Promise((resolve) => setTimeout(resolve, 10000));
+                    return requestToYoutube();
                 }
 
                 if (payload.chat_id) {
