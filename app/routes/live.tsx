@@ -8,33 +8,24 @@ import { ViewHunterRow, ProviderAuth } from "~/src/components";
 import axios from "axios";
 import { GoogleUserApi, YoutubeLiveApi } from "~/src/types";
 
-import ArrayController from "~/src/utils/arrayController";
+import OriginalButton from "~/src/components/uiButton";
+
+import { HunterInfo, HunterRepository } from "~/src/models";
+
+const hunterRepository = new HunterRepository();
 
 export const loader = ({ request }: LoaderFunctionArgs) => {
     const chat_id = new URL(request.url).searchParams.get('host');
     return json({ chat_id });
 }
 
-type HunterInfo = {
-    avator: string,
-    name: string
-    status:   'join-us' | 'stand-by' | 'just-leave',
-    quest:    number,
-} 
-
 export default function Live() {
     const data = useLoaderData<{ chat_id: string}>();
-    // const [chats, setChats] = useState<YoutubeLiveApi.POSTresponse['latest_chat'][]>([]);
-    const [hunters, setHunters] = useState<{
-        host: HunterInfo,
-        joiners: HunterInfo[]
-        standbys: HunterInfo[]
-        justleaves: HunterInfo[]
-    }>({
+    
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [hunters, setHunters] = useState({
         host: {} as HunterInfo,
-        joiners: [],
-        standbys: [],
-        justleaves: [],
+        ...hunterRepository.toJson()
     });
     const [next_page_token, setNextPageToken] = useState<YoutubeLiveApi.POSTresponse['page_token']>(null);
 
@@ -44,6 +35,7 @@ export default function Live() {
         .then((res) => {
             const response = res.data as GoogleUserApi.GETresponse;
             setHunters({...hunters, host: {
+                id: response.id,
                 avator: response.picture,
                 name: response.name,
                 status: 'join-us',
@@ -71,120 +63,33 @@ export default function Live() {
 
             switch (response.request) {
                 case ('join'): {
-                    if (!response.user_info) break;
-
-                    // justleavesにいたとき
-                    if (hunters.justleaves.some(justleave => justleave.name === response.user_info?.name)) {
+                    if (response.user_info) {
                         setHunters({
                             ...hunters,
-                            standbys: ArrayController.insert(
-                                hunters.standbys,
-                                {
-                                    avator: response.user_info.avator,
-                                    name: response.user_info.name,
-                                    status: 'stand-by',
-                                    quest: 2
-                                }
-                            ),
-                            justleaves: ArrayController.remove(
-                                hunters.justleaves,
-                                hunters.justleaves.find(justleave => justleave.name === response.user_info?.name) as HunterInfo
-                            )
-                        });
-                    }
-
-                    // 満員だったとき
-                    if (hunters.joiners.length === 3) {
-                        // 2クエスト以上の人がjoinersにいたら交代
-                        if (hunters.joiners.some(joiner => joiner.quest > 2)) {
-                            setHunters({
-                                ...hunters, 
-                                joiners: ArrayController.replace(
-                                    hunters.joiners, 
-                                    hunters.joiners.find(joiner => joiner.quest > 2) as HunterInfo,
-                                    {
-                                        avator: response.user_info.avator,
-                                        name: response.user_info.name,
-                                        status: 'join-us',
-                                        quest: 0
-                                    }
-                                ),
-                                justleaves: ArrayController.insert(
-                                    hunters.justleaves,
-                                    {
-                                        avator: response.user_info.avator,
-                                        name: response.user_info.name,
-                                        status: 'stand-by',
-                                        quest: 2
-                                    }
-                                ),
-                            });
-
-                        // いなかったらstandbysに追加
-                        } else {
-                            setHunters({
-                                ...hunters,
-                                standbys: ArrayController.insert(
-                                    hunters.standbys,
-                                    {
-                                        avator: response.user_info.avator,
-                                        name: response.user_info.name,
-                                        status: 'stand-by',
-                                        quest: 2
-                                    }
-                                )
-                            });
-                        }
-                
-                    // joinersに空きがあるとき
-                    } else {
-                        setHunters({
-                            ...hunters, 
-                            joiners: ArrayController.insert(
-                                hunters.joiners,
-                                {
-                                    avator: response.user_info.avator,
-                                    name: response.user_info.name,
-                                    status: 'join-us',
-                                    quest: 0
-                                }
-                            )
+                            ...hunterRepository.joinHunter({
+                                id: response.user_info.id,
+                                avator: response.user_info.avator,
+                                name: response.user_info.name,
+                            })
                         });
                     }
                     break;
                 }
 
                 case ('leave'): {
-                    // 1名指定
                     if (response.user_info) {
                         setHunters({
                             ...hunters,
-                            joiners: ArrayController.remove(
-                                hunters.joiners,
-                                hunters.joiners.find(joiner => joiner.name === response.user_info?.name) as HunterInfo
-                            ),
-                            justleaves: ArrayController.insert(
-                                hunters.justleaves,
-                                {
-                                    avator: response.user_info.avator,
-                                    name: response.user_info.name,
-                                    status: 'just-leave',
-                                    quest: 2
-                                }
-                            )
-                        })
-
-                    // 複数指定
+                            ...hunterRepository.leaveHunter(response.user_info.id)
+                        });
                     } else if (response.user_names) {
                         setHunters({
                             ...hunters,
-                            joiners: hunters.joiners.filter(joiner => !response.user_names?.includes(joiner.name)),
-                            standbys: hunters.standbys.filter(standby => !response.user_names?.includes(standby.name))
-                        })
+                            ...hunterRepository.manyLeaveHunter(response.user_names)
+                        });
                     }
                     break;
                 }
-
                 default: break;
             }
 
@@ -193,6 +98,13 @@ export default function Live() {
         .catch(err => 
             console.error(err.response.data.replace('Unexpected Server Error\n\n', ''))
         );
+    }
+
+    const questDoneHandler = () => {
+        setHunters({
+            ...hunters,
+            ...hunterRepository.doneQuest()
+        });
     }
 
 
@@ -211,7 +123,7 @@ export default function Live() {
                                 quest={hunters.host.quest}
                                 is_owner
                             />
-                            { hunters.joiners.map((joiner, index) => joiner && joiner.status == 'join-us' ? (
+                            { hunters.Joined.map((joiner, index) => joiner.status == 'join-us' ? (
                                 <ViewHunterRow 
                                     key={index}
                                     hunter={{
@@ -226,7 +138,10 @@ export default function Live() {
                         </Flex>
                     </Card>
                     <Flex className="text-white p-1" direction='column'>
-                        { hunters.standbys.map((standby, index) => standby && standby.status == 'stand-by' ? (
+                        <OriginalButton onClick={questDoneHandler}>
+                            クエスト終了
+                        </OriginalButton>
+                        { hunters.StandBy.map((standby, index) => standby.status == 'stand-by' ? (
                             <ViewHunterRow 
                                 key={index}
                                 hunter={{
