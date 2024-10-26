@@ -28,7 +28,6 @@ export default function Index() {
     const liveConnectHandler = () => {
         axios.get(`/api/youtube-live?live_id=${liveID}`)
         .then(res => {
-            console.log(res.data);
             navigate(`/live?host=${res.data.chat_id}`);
         })
         .catch(err => {
