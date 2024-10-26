@@ -115,23 +115,13 @@ export default function Live() {
                     <Card className="w-full border-yellow-700 border-4 border-double bg-slate-950/95 text-white" h={132}>
                         <Flex direction='column'>
                             <ViewHunterRow 
-                                hunter={{
-                                    avator: hunters.host.avator, 
-                                    name: hunters.host.name
-                                }} 
-                                status={hunters.host.status}
-                                quest={hunters.host.quest}
+                                {...hunters.host}
                                 is_owner
                             />
                             { hunters.Joined.map((joiner, index) => joiner.status == 'join-us' ? (
                                 <ViewHunterRow 
                                     key={index}
-                                    hunter={{
-                                        avator: joiner.avator, 
-                                        name: joiner.name
-                                    }} 
-                                    status={joiner.status} 
-                                    quest={joiner.quest}
+                                    {...joiner}
                                     is_owner={false}
                                 />
                             ): <></>)}
@@ -144,12 +134,7 @@ export default function Live() {
                         { hunters.StandBy.map((standby, index) => standby.status == 'stand-by' ? (
                             <ViewHunterRow 
                                 key={index}
-                                hunter={{
-                                    avator: standby.avator, 
-                                    name: standby.name
-                                }} 
-                                status={standby.status}
-                                quest={standby.quest}
+                                {...standby}
                                 is_owner={false}
                             />
                         ): <></>)}

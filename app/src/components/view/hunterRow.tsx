@@ -1,27 +1,20 @@
 import { Flex, Icon, Image, Stack, Text } from "@chakra-ui/react"
 import { RiLiveFill } from "react-icons/ri";
+import { HunterInfo } from "~/src/models";
 
-type Props = {
-    hunter: {
-        avator: string,
-        name:   string,
-    },
-    status:   'join-us' | 'stand-by' | 'just-leave',
-    quest:    number,
-    is_owner: boolean
-}
+type Props = HunterInfo & { is_owner: boolean };
 
 export default function HunterRow(props: Props) {
     return (
         <Flex className="p-1 text-white" alignItems='center' gap={1}>
             <Image 
-                src={props.hunter.avator}
+                src={props.avator}
                 borderRadius='full'
                 alt='Hunter Avator' 
                 w={5}
                 h={5}
             />
-            <Text fontSize='12px'>{props.hunter.name}</Text>
+            <Text fontSize='12px'>{props.name}</Text>
             <Stack className="ml-auto" direction='row' alignItems='end' gap={1}>
             {
                 props.is_owner ? 
