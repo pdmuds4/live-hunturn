@@ -76,14 +76,14 @@ export const action = (args: ActionFunctionArgs) => apiHandler(
                     const page_token = response.data.nextPageToken ? response.data.nextPageToken : '';
                     
                     if (chats && chats.length > 0) {
-                        const latest5_chat = chats.slice(-10).reverse();
+                        const latest5_chat = chats.slice(-5).reverse();
                         
                         // command check
                         for (const chat of latest5_chat) {
                             const chat_message = chat.snippet?.displayMessage as string;
                             if (command.isCommand(chat_message)) {
                                 const { request, users } = command.process(chat_message);
-                                if (users) {
+                                if (users?.length) {
                                     return json({
                                         user_names: users,
                                         request,
@@ -104,17 +104,16 @@ export const action = (args: ActionFunctionArgs) => apiHandler(
                                         page_token
                                     }) as TypedResponse<YoutubeLiveApi.POSTresponse>;
                                 }
-
                             }
                         }
                     }
 
                     await new Promise((resolve) => setTimeout(resolve, 10000));
-                    return requestToYoutube();
+                    return await requestToYoutube();
                 }
 
                 if (payload.chat_id) {
-                    return requestToYoutube();
+                    return await requestToYoutube();
                 } else {
                     throw new ServerError(
                         'チャットIDが見つかりませんでした',

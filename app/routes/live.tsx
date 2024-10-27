@@ -45,12 +45,19 @@ export default function Live() {
         .catch(err => {
             console.error(err.response.data.replace('Unexpected Server Error\n\n', ''));
         });
-
-        chatWatcher();
-        // const intervalId = setInterval(chatWatcher, 2000);
-        // return () => clearInterval(intervalId);
+        
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
+
+    useEffect(()=>{
+        if (hunters.host.id) {
+            const interval = setInterval(()=>{
+                if (hunters.host.id) chatWatcher();
+            }, 5000);
+            return () => clearInterval(interval);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[hunters]);
 
 
     const chatWatcher = () => {
@@ -60,12 +67,13 @@ export default function Live() {
         })
         .then(res => {
             const response = res.data as YoutubeLiveApi.POSTresponse;
+            console.log(response);
 
             switch (response.request) {
                 case ('join'): {
                     if (response.user_info) {
                         setHunters({
-                            ...hunters,
+                            host: hunters.host,
                             ...hunterRepository.joinHunter({
                                 id: response.user_info.id,
                                 avator: response.user_info.avator,
@@ -79,12 +87,12 @@ export default function Live() {
                 case ('leave'): {
                     if (response.user_info) {
                         setHunters({
-                            ...hunters,
+                            host: hunters.host,
                             ...hunterRepository.leaveHunter(response.user_info.id)
                         });
                     } else if (response.user_names) {
                         setHunters({
-                            ...hunters,
+                            host: hunters.host,
                             ...hunterRepository.manyLeaveHunter(response.user_names)
                         });
                     }
@@ -102,7 +110,7 @@ export default function Live() {
 
     const questDoneHandler = () => {
         setHunters({
-            ...hunters,
+            host: hunters.host,
             ...hunterRepository.doneQuest()
         });
     }

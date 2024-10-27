@@ -66,10 +66,8 @@ export default class HunterRepository {
         const must_leave_hunter = this.Joined.find(h => h.mustLeave())
         const must_join_hunter = this.StandBy.find(h => h.mustJoin())
 
-        if (must_leave_hunter && must_join_hunter) {
-            this.leaveHunter(must_leave_hunter.id)
-            return this.joinHunter(must_join_hunter);
-        }
+        if (must_leave_hunter) this.leaveHunter(must_leave_hunter.id)
+        if (must_join_hunter) this.joinHunter(must_join_hunter)
 
         return this.toJson();
     }
