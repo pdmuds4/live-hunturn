@@ -82,7 +82,7 @@ export const action = (args: ActionFunctionArgs) => apiHandler(
                             query: latest5_chat.map(chat => {
                                 const chat_message = chat.snippet?.displayMessage as string;
                                 if (command.isCommand(chat_message)) {
-                                    const { request, users } = command.process(chat_message);
+                                    const { request, users } = command.parse(chat_message);
                                     if (users && users.length) {
                                         return {
                                             user_names: users,

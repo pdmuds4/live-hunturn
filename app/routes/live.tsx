@@ -3,15 +3,11 @@ import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
 import { Card, Flex } from "@chakra-ui/react";
-import { ViewHunterRow, ProviderAuth } from "~/src/components";
+import { ViewHunterRow, ProviderAuth, UiButton } from "~/src/components";
 
 import axios from "axios";
 import { GoogleUserApi, YoutubeLiveApi, type HunterInfo } from "~/src/types";
-
-import OriginalButton from "~/src/components/uiButton";
-
 import { HunterRepository } from "~/src/models";
-
 
 const hunterRepository = new HunterRepository();
 
@@ -150,9 +146,9 @@ export default function Live() {
                         </Flex>
                     </Card>
                     <Flex className="text-white p-1" direction='column'>
-                        <OriginalButton onClick={questDoneHandler}>
+                        <UiButton onClick={questDoneHandler}>
                             クエスト終了
-                        </OriginalButton>
+                        </UiButton>
                         { hunters.StandBy.map((standby, index) => standby.status == 'stand-by' ? (
                             <ViewHunterRow 
                                 key={index}

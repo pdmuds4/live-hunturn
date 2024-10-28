@@ -11,7 +11,7 @@ export default class CommandProcessor {
         return message.startsWith('!');
     }
 
-    process(command: string) {
+    parse(command: string) {
         const [func_name, ...args] = command.replace('!', '').split(' ');
 
         if (!this.commandAsset[func_name]) throw new Error('不正なコマンドです');
