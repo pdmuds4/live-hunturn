@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef} from "react";
 import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
@@ -25,7 +25,11 @@ export default function Live() {
         ...hunterRepository.toJson()
     });
     const [next_page_token, setNextPageToken] = useState<string|null>(null);
+    const [interval_time, setIntervalTime] = useState<number>(10000);
     // const [query_log, setQueryLog] = useState<NonNullable<YoutubeLiveApi.POSTresponse>>([]);
+
+    const joinAudio = useRef<HTMLAudioElement>(null);
+    const leaveAudio = useRef<HTMLAudioElement>(null);
 
 
     useEffect(()=>{
@@ -51,7 +55,7 @@ export default function Live() {
         if (hunters.host.id) {
             const interval = setInterval(()=>{
                 if (hunters.host.id) chatWatcher();
-            }, 10000);
+            }, interval_time);
             return () => clearInterval(interval);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -158,6 +162,12 @@ export default function Live() {
                         ): <></>)}
                     </Flex>
                 </Card>
+                <audio ref={joinAudio}>
+                    <track kind="captions" src="/audio/join.mp3" />
+                </audio>
+                <audio ref={leaveAudio}>
+                    <track kind="captions" src="/audio/leave.mp3" />
+                </audio>
             </Flex>
         </ProviderAuth>
     );
