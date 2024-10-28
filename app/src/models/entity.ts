@@ -1,10 +1,4 @@
-export type HunterInfo = {
-    id: string
-    avator: string,
-    name: string,
-    status: 'join-us' | 'stand-by' | 'just-leave',
-    quest: number,
-}
+import { HunterInfo } from "~/src/types"
 
 export default class HunterEntity {
     readonly id: string

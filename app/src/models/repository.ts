@@ -1,4 +1,5 @@
-import HunterEntity, { HunterInfo } from "./entity";
+import HunterEntity from "~/src/models/entity";
+import { HunterInfo } from "~/src/types";
 
 export default class HunterRepository {
     Joined:    HunterEntity[]

@@ -63,7 +63,7 @@ export const action = (args: ActionFunctionArgs) => apiHandler(
             case 'POST': {
                 const payload = await request.json() as YoutubeLiveApi.POSTrequest;
 
-                const requestToYoutube = async() => {
+                if (payload.chat_id) {
                     const response = await client.liveChatMessages.list(
                         {
                             liveChatId: payload.chat_id,
@@ -71,49 +71,51 @@ export const action = (args: ActionFunctionArgs) => apiHandler(
                             pageToken: payload.page_token ? payload.page_token : undefined
                         }
                     );
-
+    
                     const chats = response.data.items
                     const page_token = response.data.nextPageToken ? response.data.nextPageToken : '';
                     
                     if (chats && chats.length > 0) {
-                        const latest5_chat = chats.slice(-5).reverse();
-                        
-                        // command check
-                        for (const chat of latest5_chat) {
-                            const chat_message = chat.snippet?.displayMessage as string;
-                            if (command.isCommand(chat_message)) {
-                                const { request, users } = command.process(chat_message);
-                                if (users?.length) {
-                                    return json({
-                                        user_names: users,
-                                        request,
-                                        page_token
-                                    }) as TypedResponse<YoutubeLiveApi.POSTresponse>;
+                        const latest5_chat = chats.slice(-10).reverse();
+
+                        return json({
+                            query: latest5_chat.map(chat => {
+                                const chat_message = chat.snippet?.displayMessage as string;
+                                if (command.isCommand(chat_message)) {
+                                    const { request, users } = command.process(chat_message);
+                                    if (users && users.length) {
+                                        return {
+                                            user_names: users,
+                                            request,
+                                            page_token
+                                        }
+                                    } else {
+                                        const user_info = {
+                                            id:        chat.authorDetails?.channelId       ? chat.authorDetails.channelId       : null,
+                                            name:      chat.authorDetails?.displayName     ? chat.authorDetails.displayName     : null,
+                                            avator:    chat.authorDetails?.profileImageUrl ? chat.authorDetails.profileImageUrl : null,
+                                            message:   chat.snippet?.displayMessage        ? chat.snippet.displayMessage        : null,
+                                            timestamp: chat.snippet?.publishedAt           ? new Date(chat.snippet.publishedAt) : null,
+                                        }
+        
+                                        return {
+                                            user_info,
+                                            request,
+                                            page_token
+                                        }
+                                    }
                                 } else {
-                                    const user_info = chat.authorDetails && chat.snippet ? {
-                                        id:        chat.authorDetails.channelId       ? chat.authorDetails.channelId       : null,
-                                        name:      chat.authorDetails.displayName     ? chat.authorDetails.displayName     : null,
-                                        avator:    chat.authorDetails.profileImageUrl ? chat.authorDetails.profileImageUrl : null,
-                                        message:   chat.snippet.displayMessage        ? chat.snippet.displayMessage        : null,
-                                        timestamp: chat.snippet.publishedAt           ? new Date(chat.snippet.publishedAt) : null,
-                                    }: undefined;
-
-                                    return json({
-                                        user_info,
-                                        request,
-                                        page_token
-                                    }) as TypedResponse<YoutubeLiveApi.POSTresponse>;
+                                    return null;
                                 }
-                            }
-                        }
+                            }).filter((i) => i !== null),
+                            page_token
+                        }) as TypedResponse<YoutubeLiveApi.POSTresponse>;
+                    } else {
+                        return json({
+                            query: null,
+                            page_token
+                        }) as TypedResponse<YoutubeLiveApi.POSTresponse>;
                     }
-
-                    await new Promise((resolve) => setTimeout(resolve, 10000));
-                    return await requestToYoutube();
-                }
-
-                if (payload.chat_id) {
-                    return await requestToYoutube();
                 } else {
                     throw new ServerError(
                         'チャットIDが見つかりませんでした',

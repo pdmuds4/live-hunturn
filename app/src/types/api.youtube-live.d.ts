@@ -13,14 +13,16 @@ export type POSTrequest = {
 }
 
 export type POSTresponse = {
-    user_info?: {
-        id: string;
-        name: string;
-        avator: string;
-        message: string;
-        timestamp: Date;
-    },
-    user_names?: string[],
-    request: 'join' | 'leave' | 'rejoin',
+    query : {
+        user_info?: {
+            id: string;
+            name: string;
+            avator: string;
+            message: string;
+            timestamp: Date;
+        },
+        user_names?: string[],
+        request: 'join' | 'leave' | 'rejoin',
+    }[] | null;
     page_token: string | null;
 }

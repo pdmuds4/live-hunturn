@@ -6,11 +6,12 @@ import { Card, Flex } from "@chakra-ui/react";
 import { ViewHunterRow, ProviderAuth } from "~/src/components";
 
 import axios from "axios";
-import { GoogleUserApi, YoutubeLiveApi } from "~/src/types";
+import { GoogleUserApi, YoutubeLiveApi, type HunterInfo } from "~/src/types";
 
 import OriginalButton from "~/src/components/uiButton";
 
-import { HunterInfo, HunterRepository } from "~/src/models";
+import { HunterRepository } from "~/src/models";
+
 
 const hunterRepository = new HunterRepository();
 
@@ -27,7 +28,8 @@ export default function Live() {
         host: {} as HunterInfo,
         ...hunterRepository.toJson()
     });
-    const [next_page_token, setNextPageToken] = useState<YoutubeLiveApi.POSTresponse['page_token']>(null);
+    const [next_page_token, setNextPageToken] = useState<string|null>(null);
+    // const [query_log, setQueryLog] = useState<NonNullable<YoutubeLiveApi.POSTresponse>>([]);
 
 
     useEffect(()=>{
@@ -53,59 +55,71 @@ export default function Live() {
         if (hunters.host.id) {
             const interval = setInterval(()=>{
                 if (hunters.host.id) chatWatcher();
-            }, 5000);
+            }, 10000);
             return () => clearInterval(interval);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[hunters]);
 
 
-    const chatWatcher = () => {
-        axios.post('/api/youtube-live', {
-            chat_id: data.chat_id,
-            page_token: next_page_token
-        })
-        .then(res => {
+    const chatWatcher = async () => {
+        try {
+            const res = await axios.post('/api/youtube-live', {
+                chat_id: data.chat_id,
+                page_token: next_page_token
+            });
+
             const response = res.data as YoutubeLiveApi.POSTresponse;
             console.log(response);
 
-            switch (response.request) {
-                case ('join'): {
-                    if (response.user_info) {
-                        setHunters({
-                            host: hunters.host,
-                            ...hunterRepository.joinHunter({
-                                id: response.user_info.id,
-                                avator: response.user_info.avator,
-                                name: response.user_info.name,
-                            })
-                        });
-                    }
-                    break;
-                }
+            // if (response && response.length) {
+            //     const new_query = response.filter((res) => 
+            //         query_log.some((log) => log.user_info?.id !== res.user_info?.id) &&
+            //         query_log.some((log) => log.user_names !== res.user_names) &&
+            //         query_log.some((log) => log.request !== res.request)
+            //     );
 
-                case ('leave'): {
-                    if (response.user_info) {
-                        setHunters({
-                            host: hunters.host,
-                            ...hunterRepository.leaveHunter(response.user_info.id)
-                        });
-                    } else if (response.user_names) {
-                        setHunters({
-                            host: hunters.host,
-                            ...hunterRepository.manyLeaveHunter(response.user_names)
-                        });
-                    }
-                    break;
-                }
-                default: break;
-            }
+            //     console.log(new_query);
 
-            setNextPageToken(res.data.page_token);
-        })
-        .catch(err => 
-            console.error(err.response.data.replace('Unexpected Server Error\n\n', ''))
-        );
+            //     new_query.forEach((query) => {
+            //         switch (query.request) {
+            //             case ('join'): {
+            //                 if (query.user_info) {
+            //                     setHunters({
+            //                         host: hunters.host,
+            //                         ...hunterRepository.joinHunter({
+            //                             id: query.user_info.id,
+            //                             avator: query.user_info.avator,
+            //                             name: query.user_info.name,
+            //                         })
+            //                     });
+            //                 }
+            //                 break;
+            //             }
+
+            //             case ('leave'): {
+            //                 if (query.user_info) {
+            //                     setHunters({
+            //                         host: hunters.host,
+            //                         ...hunterRepository.leaveHunter(query.user_info.id)
+            //                     });
+            //                 } else if (query.user_names) {
+            //                     setHunters({
+            //                         host: hunters.host,
+            //                         ...hunterRepository.manyLeaveHunter(query.user_names)
+            //                     });
+            //                 }
+            //                 break;
+            //             }
+            //             default: break;
+            //         }
+            //     });
+            //     setNextPageToken(res.data.page_token);
+            // }
+            setNextPageToken(response.page_token);
+        } catch (err) {
+            console.error(err)
+        }
     }
 
     const questDoneHandler = () => {
