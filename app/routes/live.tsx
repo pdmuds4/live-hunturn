@@ -84,6 +84,7 @@ export default function Live() {
                                         name: query.user_info.name,
                                     })
                                 });
+                                joinAudio.current?.play();
                             }
                             break;
                         }
@@ -99,6 +100,7 @@ export default function Live() {
                                     host: hunters.host,
                                     ...hunterRepository.toJson()
                                 });
+                                leaveAudio.current?.play();
                             }
                             break;
                         }
