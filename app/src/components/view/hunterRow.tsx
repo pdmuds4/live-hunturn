@@ -1,6 +1,6 @@
 import { Flex, Icon, Image, Stack, Text } from "@chakra-ui/react"
 import { RiLiveFill } from "react-icons/ri";
-import { HunterInfo } from "~/src/models";
+import { HunterInfo } from "~/src/types";
 
 type Props = HunterInfo & { is_owner: boolean };
 
@@ -32,7 +32,7 @@ export default function HunterRow(props: Props) {
                 </>           
             ) : (
                 <>
-                    <Text color='#f6d346'>あと{props.quest}</Text>
+                    <Text color='#f6d346'>待機中：{props.quest}</Text>
                     <Text color='#f7d95f' fontSize='10px'>Quest</Text> 
                 </>
             )

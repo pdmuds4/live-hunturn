@@ -76,7 +76,7 @@ export const action = (args: ActionFunctionArgs) => apiHandler(
                     const page_token = response.data.nextPageToken ? response.data.nextPageToken : '';
                     
                     if (chats && chats.length > 0) {
-                        const latest5_chat = chats.slice(-10).reverse();
+                        const latest5_chat = chats.slice(-10);
 
                         return json({
                             query: latest5_chat.map(chat => {
@@ -86,22 +86,20 @@ export const action = (args: ActionFunctionArgs) => apiHandler(
                                     if (users && users.length) {
                                         return {
                                             user_names: users,
-                                            request,
-                                            page_token
+                                            request
                                         }
                                     } else {
                                         const user_info = {
-                                            id:        chat.authorDetails?.channelId       ? chat.authorDetails.channelId       : null,
-                                            name:      chat.authorDetails?.displayName     ? chat.authorDetails.displayName     : null,
-                                            avator:    chat.authorDetails?.profileImageUrl ? chat.authorDetails.profileImageUrl : null,
-                                            message:   chat.snippet?.displayMessage        ? chat.snippet.displayMessage        : null,
-                                            timestamp: chat.snippet?.publishedAt           ? new Date(chat.snippet.publishedAt) : null,
+                                            id:        chat.authorDetails!.channelId,
+                                            name:      chat.authorDetails!.displayName,
+                                            avator:    chat.authorDetails!.profileImageUrl,
+                                            message:   chat.snippet!.displayMessage,
+                                            timestamp: new Date(chat.snippet!.publishedAt!)
                                         }
         
                                         return {
                                             user_info,
-                                            request,
-                                            page_token
+                                            request
                                         }
                                     }
                                 } else {

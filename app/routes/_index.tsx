@@ -20,7 +20,7 @@ export default function Index() {
         })
         .catch(err => {
             alert(err.response.data.replace('Unexpected Server Error\n\n', ''));
-            navigate('/login/');
+            navigate('/login');
         });
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

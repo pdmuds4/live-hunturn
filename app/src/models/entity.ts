@@ -4,7 +4,7 @@ export default class HunterEntity {
     readonly id: string
     avator: string
     name:   string
-    status: 'join-us' | 'stand-by' | 'just-leave'
+    status: 'join-us' | 'stand-by'
     quest:  number
 
     constructor(hunterInfo: HunterInfo) {
@@ -15,52 +15,28 @@ export default class HunterEntity {
         this.quest = hunterInfo.quest
     }
 
-    changeStatus(status: 'join-us' | 'stand-by' | 'just-leave') {
+    changeStatus(status: 'join-us' | 'stand-by') {
         return new HunterEntity({
             id: this.id,
             avator: this.avator,
             name: this.name,
             status: status,
-            quest: status === 'stand-by' ? 2 : 0
-        })
-    }
-
-    resetQuest() {
-        return new HunterEntity({
-            id: this.id,
-            avator: this.avator,
-            name: this.name,
-            status: this.status,
             quest: 0
         })
     }
 
     doneQuest() {
-        if (this.status === 'join-us' || this.status === 'just-leave') {
-            return new HunterEntity({
-                id: this.id,
-                avator: this.avator,
-                name: this.name,
-                status: this.status,
-                quest: this.quest + 1
-            })
-        } else {
-            return new HunterEntity({
-                id: this.id,
-                avator: this.avator,
-                name: this.name,
-                status: this.status,
-                quest: this.quest == 0 ? this.quest : this.quest - 1
-            })
-        }
+        return new HunterEntity({
+            id: this.id,
+            avator: this.avator,
+            name: this.name,
+            status: this.status,
+            quest: this.quest + 1
+        })
     }
 
-    mustLeave() {
-        return this.status === 'join-us' && this.quest >= 2
-    }
-
-    mustJoin() {
-        return this.status === 'stand-by' && this.quest <= 0
+    mustChange() {
+        return this.quest >= 2
     }
 
     toJson(): HunterInfo {

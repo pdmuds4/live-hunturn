@@ -26,7 +26,6 @@ export default function Live() {
     });
     const [next_page_token, setNextPageToken] = useState<string|null>(null);
     const [interval_time, setIntervalTime] = useState<number>(10000);
-    // const [query_log, setQueryLog] = useState<NonNullable<YoutubeLiveApi.POSTresponse>>([]);
 
     const joinAudio = useRef<HTMLAudioElement>(null);
     const leaveAudio = useRef<HTMLAudioElement>(null);
@@ -72,50 +71,46 @@ export default function Live() {
             const response = res.data as YoutubeLiveApi.POSTresponse;
             console.log(response);
 
-            // if (response && response.length) {
-            //     const new_query = response.filter((res) => 
-            //         query_log.some((log) => log.user_info?.id !== res.user_info?.id) &&
-            //         query_log.some((log) => log.user_names !== res.user_names) &&
-            //         query_log.some((log) => log.request !== res.request)
-            //     );
+            if (response.query && response.query.length) {
+                response.query.forEach((query) => {
+                    switch (query.request) {
+                        case ('join'): {
+                            if (query.user_info) {
+                                setHunters({
+                                    host: hunters.host,
+                                    ...hunterRepository.joinHunter({
+                                        id: query.user_info.id,
+                                        avator: query.user_info.avator,
+                                        name: query.user_info.name,
+                                    })
+                                });
+                            }
+                            break;
+                        }
 
-            //     console.log(new_query);
+                        case ('leave'): {
+                            if (query.user_info) {
+                                setHunters({
+                                    host: hunters.host,
+                                    ...hunterRepository.leaveHunter(query.user_info.id)
+                                });
+                            } else if (query.user_names) {
+                                setHunters({
+                                    host: hunters.host,
+                                    ...hunterRepository.toJson()
+                                });
+                            }
+                            break;
+                        }
+                        default: break;
+                    }
+                });
 
-            //     new_query.forEach((query) => {
-            //         switch (query.request) {
-            //             case ('join'): {
-            //                 if (query.user_info) {
-            //                     setHunters({
-            //                         host: hunters.host,
-            //                         ...hunterRepository.joinHunter({
-            //                             id: query.user_info.id,
-            //                             avator: query.user_info.avator,
-            //                             name: query.user_info.name,
-            //                         })
-            //                     });
-            //                 }
-            //                 break;
-            //             }
+                setIntervalTime(10000);
+            } else {
+                setIntervalTime(interval_time*1.1);
+            }
 
-            //             case ('leave'): {
-            //                 if (query.user_info) {
-            //                     setHunters({
-            //                         host: hunters.host,
-            //                         ...hunterRepository.leaveHunter(query.user_info.id)
-            //                     });
-            //                 } else if (query.user_names) {
-            //                     setHunters({
-            //                         host: hunters.host,
-            //                         ...hunterRepository.manyLeaveHunter(query.user_names)
-            //                     });
-            //                 }
-            //                 break;
-            //             }
-            //             default: break;
-            //         }
-            //     });
-            //     setNextPageToken(res.data.page_token);
-            // }
             setNextPageToken(response.page_token);
         } catch (err) {
             console.error(err)
@@ -127,6 +122,7 @@ export default function Live() {
             host: hunters.host,
             ...hunterRepository.doneQuest()
         });
+        console.log(hunters);
     }
 
 
@@ -149,7 +145,7 @@ export default function Live() {
                             ): <></>)}
                         </Flex>
                     </Card>
-                    <Flex className="text-white p-1" direction='column'>
+                    <Flex className="text-white p-1 h-full" direction='column'>
                         <UiButton onClick={questDoneHandler}>
                             クエスト終了
                         </UiButton>
