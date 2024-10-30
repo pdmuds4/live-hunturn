@@ -1,11 +1,13 @@
 import { ActionFunctionArgs, json, LoaderFunctionArgs, TypedResponse } from "@remix-run/node";
 import ServerError from "./serverError";
+import axios from "axios";
 
 export default function apiHandler(
     args: LoaderFunctionArgs|ActionFunctionArgs, 
     apiFunc: (args: LoaderFunctionArgs|ActionFunctionArgs)=>Promise<TypedResponse>
 ) {
     try {
+        axios.defaults.baseURL = import.meta.env.VITE_GOOGLE_REDIRECT_URI;
         return apiFunc(args);
     } catch (e) {
         if (e instanceof Error) {

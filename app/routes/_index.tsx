@@ -25,16 +25,6 @@ export default function Index() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const liveConnectHandler = () => {
-        axios.get(`/api/youtube-live?live_id=${liveID}`)
-        .then(res => {
-            navigate(`/live?host=${res.data.chat_id}`);
-        })
-        .catch(err => {
-            alert(err.response.data.replace('Unexpected Server Error\n\n', ''));
-        });
-    }
-
     return (
         <ProviderAuth>
             <ViewHomeLayout>
@@ -67,7 +57,7 @@ export default function Index() {
                     <UiButton
                         leftIcon={<Icon as={MdOutlineLiveTv} />}
                         disabled={!liveID.length}
-                        onClick={liveConnectHandler}
+                        onClick={()=>navigate(`/live?v=${liveID}`)}
                     >
                         配信に接続する
                     </UiButton>

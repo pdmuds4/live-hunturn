@@ -1,123 +1,114 @@
 import { useEffect, useState, useRef} from "react";
-import { json, LoaderFunctionArgs } from "@remix-run/node";
+import { json, LoaderFunctionArgs, redirect } from "@remix-run/node";
+
+import ServerError from "~/src/utils/serverError";
+import apiHandler from "~/src/utils/apiHandler";
 import { useLoaderData } from "@remix-run/react";
 
 import { Card, Flex } from "@chakra-ui/react";
 import { ViewHunterRow, ProviderAuth, UiButton } from "~/src/components";
 
 import axios from "axios";
-import { GoogleUserApi, YoutubeLiveApi, type HunterInfo } from "~/src/types";
+import { YoutubeLiveApi, type HunterInfo } from "~/src/types";
 import { HunterRepository } from "~/src/models";
+
 
 const hunterRepository = new HunterRepository();
 
-export const loader = ({ request }: LoaderFunctionArgs) => {
-    const chat_id = new URL(request.url).searchParams.get('host');
-    return json({ chat_id });
-}
+export const loader = (args: LoaderFunctionArgs) => apiHandler(
+    args,
+    async ({ request }) => {
+        const live_id = new URL(request.url).searchParams.get('v');
+        const response = await axios.get(`/api/youtube-live?live_id=${live_id}`);
+        return json(response.data);
+    }
+)
 
 export default function Live() {
-    const data = useLoaderData<{ chat_id: string}>();
+    const data = useLoaderData<YoutubeLiveApi.GETresponse>();
+    console.log(data);
     
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [hunters, setHunters] = useState({
-        host: {} as HunterInfo,
+        host: {
+            ...data.host,
+            status: 'join-us',
+        } as HunterInfo,
         ...hunterRepository.toJson()
     });
     const [next_page_token, setNextPageToken] = useState<string|null>(null);
-    const [interval_time, setIntervalTime] = useState<number>(10000);
 
     const joinAudio = useRef<HTMLAudioElement>(null);
     const leaveAudio = useRef<HTMLAudioElement>(null);
 
-
-    useEffect(()=>{
-        axios.get('/api/google-user')
-        .then((res) => {
-            const response = res.data as GoogleUserApi.GETresponse;
-            setHunters({...hunters, host: {
-                id: response.id,
-                avator: response.picture,
-                name: response.name,
-                status: 'join-us',
-                quest: 0
-            }});
-        })
-        .catch(err => {
-            console.error(err.response.data.replace('Unexpected Server Error\n\n', ''));
-        });
-        
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[])
-
-    useEffect(()=>{
-        if (hunters.host.id) {
-            const interval = setInterval(()=>{
-                if (hunters.host.id) chatWatcher();
-            }, interval_time);
-            return () => clearInterval(interval);
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[hunters]);
+    // useEffect(()=>{
+    //     if (hunters.host.id) {
+    //         const interval = setInterval(()=>{
+    //             if (hunters.host.id) chatWatcher();
+    //         }, interval_time);
+    //         return () => clearInterval(interval);
+    //     }
+    // // eslint-disable-next-line react-hooks/exhaustive-deps
+    // },[hunters]);
 
 
-    const chatWatcher = async () => {
-        try {
-            const res = await axios.post('/api/youtube-live', {
-                chat_id: data.chat_id,
-                page_token: next_page_token
-            });
+    // const chatWatcher = async () => {
+    //     try {
+    //         const res = await axios.post('/api/youtube-live', {
+    //             chat_id: data.chat_id,
+    //             page_token: next_page_token
+    //         });
 
-            const response = res.data as YoutubeLiveApi.POSTresponse;
-            console.log(response);
+    //         const response = res.data as YoutubeLiveApi.POSTresponse;
+    //         console.log(response);
 
-            if (response.query && response.query.length) {
-                response.query.forEach((query) => {
-                    switch (query.request) {
-                        case ('join'): {
-                            if (query.user_info) {
-                                setHunters({
-                                    host: hunters.host,
-                                    ...hunterRepository.joinHunter({
-                                        id: query.user_info.id,
-                                        avator: query.user_info.avator,
-                                        name: query.user_info.name,
-                                    })
-                                });
-                                joinAudio.current?.play();
-                            }
-                            break;
-                        }
+    //         if (response.query && response.query.length) {
+    //             response.query.forEach((query) => {
+    //                 switch (query.request) {
+    //                     case ('join'): {
+    //                         if (query.user_info) {
+    //                             setHunters({
+    //                                 host: hunters.host,
+    //                                 ...hunterRepository.joinHunter({
+    //                                     id: query.user_info.id,
+    //                                     avator: query.user_info.avator,
+    //                                     name: query.user_info.name,
+    //                                 })
+    //                             });
+    //                             joinAudio.current?.play();
+    //                         }
+    //                         break;
+    //                     }
 
-                        case ('leave'): {
-                            if (query.user_info) {
-                                setHunters({
-                                    host: hunters.host,
-                                    ...hunterRepository.leaveHunter(query.user_info.id)
-                                });
-                            } else if (query.user_names) {
-                                setHunters({
-                                    host: hunters.host,
-                                    ...hunterRepository.toJson()
-                                });
-                                leaveAudio.current?.play();
-                            }
-                            break;
-                        }
-                        default: break;
-                    }
-                });
+    //                     case ('leave'): {
+    //                         if (query.user_info) {
+    //                             setHunters({
+    //                                 host: hunters.host,
+    //                                 ...hunterRepository.leaveHunter(query.user_info.id)
+    //                             });
+    //                         } else if (query.user_names) {
+    //                             setHunters({
+    //                                 host: hunters.host,
+    //                                 ...hunterRepository.toJson()
+    //                             });
+    //                             leaveAudio.current?.play();
+    //                         }
+    //                         break;
+    //                     }
+    //                     default: break;
+    //                 }
+    //             });
 
-                setIntervalTime(10000);
-            } else {
-                setIntervalTime(interval_time*1.1);
-            }
+    //             setIntervalTime(10000);
+    //         } else {
+    //             setIntervalTime(interval_time*1.1);
+    //         }
 
-            setNextPageToken(response.page_token);
-        } catch (err) {
-            console.error(err)
-        }
-    }
+    //         setNextPageToken(response.page_token);
+    //     } catch (err) {
+    //         console.error(err)
+    //     }
+    // }
 
     const questDoneHandler = () => {
         setHunters({

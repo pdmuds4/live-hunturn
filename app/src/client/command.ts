@@ -1,20 +1,16 @@
-import type { commandReturn } from "../command";
-
 export default class CommandProcessor {
-    commandAsset: Record<string,(args?: string[])=>commandReturn>;
+    parser: Record<string,string[]>;
 
-    constructor(command_asset: Record<string,(args?: string[])=>commandReturn>) {
-        this.commandAsset = command_asset;
+    constructor(command_parser: Record<string,string[]>) {
+        this.parser = command_parser;
     }
 
-    isCommand(message: string) {
-        return message.startsWith('!');
+    recognizer(message: string): boolean {
+        return Object.keys(this.parser).some((key) => this.parser[key].includes(message));
     }
 
-    parse(command: string) {
-        const [func_name, ...args] = command.replace('!', '').split(' ');
-
-        if (!this.commandAsset[func_name]) throw new Error('不正なコマンドです');
-        return this.commandAsset[func_name](args);
+    toRequest(message: string): { request: string } {
+        const command = Object.keys(this.parser).find((key) => this.parser[key].includes(message));
+        return { request: command ? command : '' };
     }
 }

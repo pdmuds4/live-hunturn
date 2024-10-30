@@ -1,12 +1,12 @@
 export default {
     // 参加希望
-    "join" : ()=> ({ request: 'join' }),
+    join : [
+        '参加希望',
+        '参加キボンヌ'
+    ],
 
     // 退席
-    "leave" : (args?: string[]) => ({ request: 'leave', users : args }),
-}
+    leave: [
 
-export type commandReturn = {
-    request: string,
-    users?: string[]
+    ]
 }
