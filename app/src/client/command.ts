@@ -9,8 +9,8 @@ export default class CommandProcessor {
         return Object.keys(this.parser).some((key) => this.parser[key].includes(message));
     }
 
-    toRequest(message: string): { request: string } {
+    toRequest(message: string): string {
         const command = Object.keys(this.parser).find((key) => this.parser[key].includes(message));
-        return { request: command ? command : '' };
+        return command ? command : '';
     }
 }

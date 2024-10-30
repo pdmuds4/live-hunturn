@@ -7,6 +7,7 @@ export default {
 
     // 退席
     leave: [
-
+        '抜けま',
+        '落ちま'
     ]
 }

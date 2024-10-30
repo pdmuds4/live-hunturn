@@ -2,7 +2,7 @@ import { Flex, Icon, Image, Stack, Text } from "@chakra-ui/react"
 import { RiLiveFill } from "react-icons/ri";
 import { HunterInfo } from "~/src/types";
 
-type Props = HunterInfo & { is_owner: boolean };
+type Props = HunterInfo & { status: 'join-us'|'stand-by', is_owner: boolean };
 
 export default function HunterRow(props: Props) {
     return (
