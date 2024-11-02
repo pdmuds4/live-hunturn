@@ -11,12 +11,13 @@ export default function useHuntersManager(data: YoutubeLiveApi.GETresponse) {
         ...factory.toJson()
     });
     const [next_page_token, setNextPageToken] = useState<string|null>(null);
+    const [interval_time, setIntervalTime] = useState<number>(10000);
 
     useEffect(()=>{
         if (hunters.host.id) {
             const interval = setInterval(()=>{
                 if (hunters.host.id) watcher();
-            }, 10000);
+            }, interval_time);
             return () => clearInterval(interval);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -38,6 +39,9 @@ export default function useHuntersManager(data: YoutubeLiveApi.GETresponse) {
                         ...factory.queryParser(query)
                     })
                 })
+                setIntervalTime(10000);
+            } else {
+                setIntervalTime(interval_time < 20000 ? interval_time*1.1 : 20000);
             }
             setNextPageToken(response.page_token);
         } catch (error) {
