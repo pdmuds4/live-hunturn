@@ -72,7 +72,7 @@ export default class HunterFactory {
 
 
     changeHunter(leaveId: string, joinHunter: HunterEntity) {
-        this.Joined = this.Joined.map(h=>h.id === leaveId ? joinHunter : h);
+        this.Joined = this.Joined.map(h=>h.id === leaveId ? joinHunter.resetQuest() : h);
         this.StandBy = this.StandBy.filter(h=>h.id !== joinHunter.id);
         return this.toJson();
     }
@@ -83,9 +83,9 @@ export default class HunterFactory {
         this.StandBy = this.StandBy.map(h=>h.doneQuest());
 
         const must_change_hunter = this.Joined.filter(h=>h.mustChange());
-        if (must_change_hunter.length) {
+        if (must_change_hunter.length && this.StandBy.length) {
             must_change_hunter.forEach((hunter) => {
-                if (this.StandBy.length) this.changeHunter(hunter.id, this.StandBy[0]);
+                this.changeHunter(hunter.id, this.StandBy[0]);
             });
         }
         return this.toJson();
