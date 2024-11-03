@@ -1,4 +1,4 @@
-import HunterEntity from "~/src/models/entity";
+import {HunterEntity, HunterStorage} from "~/src/models";
 import { HunterInfo } from "~/src/types";
 
 type Query = {
@@ -13,28 +13,30 @@ type Query = {
 }
 
 export default class HunterFactory {
-    Joined:    HunterEntity[]
-    StandBy:   HunterEntity[]
+    Joined:    HunterStorage
+    StandBy:   HunterStorage
 
-    constructor() {
-        this.Joined = []
-        this.StandBy = []
+    constructor(defaultJoined: HunterStorage, defaultStandBy: HunterStorage) {
+        this.Joined = defaultJoined
+        this.StandBy = defaultStandBy
     }
 
 
     joinHunter(info: Omit<HunterInfo,'quest'>) {
-        if (this.Joined.find(h=>h.id === info.id)||
-            this.StandBy.find(h=>h.id === info.id)
+        if (
+            this.Joined.checkById(info.id)||
+            this.StandBy.checkById(info.id)
         ) return this.toJson();
+
 
         if (this.Joined.length < 3) {
             const entity = new HunterEntity({
                 ...info,
                 quest: 0
             });
-            this.Joined = [...this.Joined, entity];
+            this.Joined.insert(entity);
         } else {
-            const must_change_hunter = this.Joined.find(h=>h.mustChange());
+            const must_change_hunter = this.Joined.findMustChange();
             if (must_change_hunter) {
                 const entity = new HunterEntity({
                     ...info,
@@ -46,7 +48,7 @@ export default class HunterFactory {
                     ...info,
                     quest: 0
                 });
-                this.StandBy = [...this.StandBy, entity];
+                this.StandBy.insert(entity);
             }
         }
         return this.toJson();
@@ -54,17 +56,17 @@ export default class HunterFactory {
 
 
     leaveHunter(id: string) {
-        const is_standby = this.StandBy.find(h=>h.id === id);
-        const is_joined = this.Joined.find(h=>h.id === id);
+        const is_standby = this.StandBy.findById(id);
+        const is_joined = this.Joined.findById(id);
 
         if (is_standby) {
-            this.StandBy = this.StandBy.filter(h=>h.id !== id);
+            this.StandBy.deleteById(id);
         } else if (is_joined) {
             if (this.StandBy.length) {
-                const standby_hunter = this.StandBy[0];
+                const standby_hunter = this.StandBy.findByIndex(0);
                 this.changeHunter(id, standby_hunter);
             } else {
-                this.Joined = this.Joined.filter(h=>h.id !== id);
+                this.Joined.deleteById(id);
             }
         }
         return this.toJson();
@@ -72,20 +74,20 @@ export default class HunterFactory {
 
 
     changeHunter(leaveId: string, joinHunter: HunterEntity) {
-        this.Joined = this.Joined.map(h=>h.id === leaveId ? joinHunter.resetQuest() : h);
-        this.StandBy = this.StandBy.filter(h=>h.id !== joinHunter.id);
+        this.Joined.replaceById(leaveId, joinHunter);
+        this.StandBy.deleteById(joinHunter.id);
         return this.toJson();
     }
 
 
     doneQuest() {
-        this.Joined = this.Joined.map(h=>h.doneQuest());
-        this.StandBy = this.StandBy.map(h=>h.doneQuest());
+        this.Joined.updateEach(h=>h.doneQuest());
+        this.StandBy.updateEach(h=>h.doneQuest());
 
-        const must_change_hunter = this.Joined.filter(h=>h.mustChange());
+        const must_change_hunter = this.Joined.filterMustChange();
         if (must_change_hunter.length && this.StandBy.length) {
             must_change_hunter.forEach((hunter) => {
-                this.changeHunter(hunter.id, this.StandBy[0]);
+                this.changeHunter(hunter.id, this.StandBy.findByIndex(0));
             });
         }
         return this.toJson();
@@ -94,8 +96,8 @@ export default class HunterFactory {
 
     toJson() {
         return {
-            Joined:    this.Joined.map(h => h.toJson()),
-            StandBy:   this.StandBy.map(h => h.toJson()),
+            Joined:    this.Joined.toJson(),
+            StandBy:   this.StandBy.toJson(),
         }
     }
 

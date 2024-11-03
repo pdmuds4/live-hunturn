@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-import { HunterFactory } from '../models';
+import { HunterFactory, HunterStorage } from '../models';
 import { YoutubeLiveApi } from '~/src/types';
 
-const factory = new HunterFactory();
+const factory = new HunterFactory(new HunterStorage(), new HunterStorage());
 export default function useHuntersManager(data: YoutubeLiveApi.GETresponse) {
     const [hunters, setHunters] = useState({
         host: data.host,
