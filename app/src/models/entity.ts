@@ -22,17 +22,17 @@ export default class HunterEntity {
         })
     }
 
-    doneQuest() {
+    doneQuest(status: 'joinus' | 'standby') {
         return new HunterEntity({
             id: this.id,
             avator: this.avator,
             name: this.name,
-            quest: this.quest + 1
+            quest: status === 'joinus' ? this.quest + 1 : this.quest - 1
         })
     }
 
-    mustChange() {
-        return this.quest >= 2
+    mustChange(status: 'joinus' | 'standby') {
+        return status === 'joinus' ? this.quest >= 2 : this.quest <= 0
     }
 
     toJson(): HunterInfo {

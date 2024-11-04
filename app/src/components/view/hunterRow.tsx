@@ -32,7 +32,7 @@ export default function HunterRow(props: Props) {
                 </>           
             ) : (
                 <>
-                    <Text color='#f6d346'>待機中：{props.quest}</Text>
+                    <Text color='#f6d346'>あと{props.quest}</Text>
                     <Text color='#f7d95f' fontSize='10px'>Quest</Text> 
                 </>
             )

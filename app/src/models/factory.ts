@@ -15,10 +15,12 @@ type Query = {
 export default class HunterFactory {
     Joined:    HunterStorage
     StandBy:   HunterStorage
+    JustLeft:  HunterStorage
 
     constructor(defaultJoined: HunterStorage, defaultStandBy: HunterStorage) {
         this.Joined = defaultJoined
         this.StandBy = defaultStandBy
+        this.JustLeft = new HunterStorage()
     }
 
 
@@ -28,6 +30,14 @@ export default class HunterFactory {
             this.StandBy.checkById(info.id)
         ) return this.toJson();
 
+        if (this.JustLeft.checkById(info.id)) {
+            const entity = new HunterEntity({
+                ...info,
+                quest: 2
+            });
+            this.StandBy.insert(entity);
+            return this.toJson();
+        }
 
         if (this.Joined.length < 3) {
             const entity = new HunterEntity({
@@ -36,7 +46,7 @@ export default class HunterFactory {
             });
             this.Joined.insert(entity);
         } else {
-            const must_change_hunter = this.Joined.findMustChange();
+            const must_change_hunter = this.Joined.findMustChange('joinus');
             if (must_change_hunter) {
                 const entity = new HunterEntity({
                     ...info,
@@ -44,10 +54,13 @@ export default class HunterFactory {
                 });
                 this.changeHunter(must_change_hunter.id, entity);
             } else {
+                const compair_hunter_quest= this.Joined.findByIndex(this.StandBy.length % 3).quest;
+                const entity_quest = 2 - compair_hunter_quest + Math.floor(this.StandBy.length / 3) * 2;
                 const entity = new HunterEntity({
                     ...info,
-                    quest: 0
+                    quest: entity_quest
                 });
+                
                 this.StandBy.insert(entity);
             }
         }
@@ -63,11 +76,12 @@ export default class HunterFactory {
             this.StandBy.deleteById(id);
         } else if (is_joined) {
             if (this.StandBy.length) {
-                const standby_hunter = this.StandBy.findByIndex(0);
-                this.changeHunter(id, standby_hunter);
+                const must_join_hunter = this.StandBy.findMustChange('standby');
+                must_join_hunter ? this.changeHunter(id, must_join_hunter) : this.changeHunter(id, this.StandBy.findByIndex(0));
             } else {
                 this.Joined.deleteById(id);
             }
+            this.JustLeft.insert(is_joined);
         }
         return this.toJson();
     }
@@ -81,13 +95,19 @@ export default class HunterFactory {
 
 
     doneQuest() {
-        this.Joined.updateEach(h=>h.doneQuest());
-        this.StandBy.updateEach(h=>h.doneQuest());
+        this.Joined.updateEach(h=>h.doneQuest('joinus'));
+        this.StandBy.updateEach(h=>h.doneQuest('standby'));
+        this.JustLeft.clear();
 
-        const must_change_hunter = this.Joined.filterMustChange();
-        if (must_change_hunter.length && this.StandBy.length) {
-            must_change_hunter.forEach((hunter) => {
-                this.changeHunter(hunter.id, this.StandBy.findByIndex(0));
+        const must_leave_hunter = this.Joined.filterMustChange('joinus').sort((a, b) => b.quest - a.quest);
+        const must_join_hunter = this.StandBy.filterMustChange('standby');
+
+        if (must_leave_hunter.length && must_join_hunter.length) {
+            must_leave_hunter.forEach((h, i) => {
+                if (must_join_hunter[i]) {
+                    this.changeHunter(h.id, must_join_hunter[i])
+                    this.JustLeft.insert(h);
+                }
             });
         }
         return this.toJson();
@@ -98,6 +118,7 @@ export default class HunterFactory {
         return {
             Joined:    this.Joined.toJson(),
             StandBy:   this.StandBy.toJson(),
+            JustLeft:  this.JustLeft.toJson()
         }
     }
 
