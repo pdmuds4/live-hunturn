@@ -19,16 +19,16 @@ export default class HunterStorage {
         return this.storage[index]
     }
 
-    findMustChange() {
-        return this.storage.find(h=>h.mustChange())
+    findMustChange(status: 'joinus' | 'standby') {
+        return this.storage.find(h=>h.mustChange(status))
     }
 
     filter(callback: (hunter: HunterEntity) => boolean) {
         return this.storage.filter(callback)
     }
 
-    filterMustChange() {
-        return this.storage.filter(h=>h.mustChange())
+    filterMustChange(status: 'joinus' | 'standby') {
+        return this.storage.filter(h=>h.mustChange(status))
     }
 
     insert(entity: HunterEntity) {
@@ -45,6 +45,10 @@ export default class HunterStorage {
 
     deleteById(id: string) {
         this.storage = this.storage.filter(h=>h.id !== id)
+    }
+
+    clear() {
+        this.storage = []
     }
 
     toJson() {
