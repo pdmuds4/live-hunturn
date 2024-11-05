@@ -13,6 +13,15 @@ export default class HunterEntity {
         this.quest = hunterInfo.quest
     }
 
+    updateQuest(quest: number) {
+        return new HunterEntity({
+            id: this.id,
+            avator: this.avator,
+            name: this.name,
+            quest: quest
+        })
+    }
+
     resetQuest() {
         return new HunterEntity({
             id: this.id,

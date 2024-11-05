@@ -21,7 +21,7 @@ export const loader = (args: LoaderFunctionArgs) => apiHandler(
 
 export default function Live() {
     const data = useLoaderData<YoutubeLiveApi.GETresponse>();
-    const { hunters, questDoneHandler } = useHuntersManager(data);
+    const { hunters, questDoneHandler, updateQuestHandler, deleteHunterHandler } = useHuntersManager(data);
 
     return (
         <Flex className="w-screen h-screen justify-center">
@@ -40,6 +40,8 @@ export default function Live() {
                                 {...joiner}
                                 status="join-us"
                                 is_owner={false}
+                                updateQuestHandler={updateQuestHandler}
+                                deleteHunterHandler={deleteHunterHandler}
                             />
                         ))}
                     </Flex>
@@ -54,6 +56,8 @@ export default function Live() {
                             {...standby}
                             status="stand-by"
                             is_owner={false}
+                            updateQuestHandler={updateQuestHandler}
+                            deleteHunterHandler={deleteHunterHandler}
                         />
                     ))}
                 </Flex>

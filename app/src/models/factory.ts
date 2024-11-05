@@ -109,7 +109,18 @@ export default class HunterFactory {
                     this.JustLeft.insert(h);
                 }
             });
+        } else if (this.Joined.length < 3 && must_join_hunter.length) {
+            must_join_hunter.forEach(h => {
+                this.StandBy.deleteById(h.id);
+                this.Joined.insert(h);
+            });
         }
+        return this.toJson();
+    }
+
+    updateHunterQuest(hunter_id: string, quest: number) {
+        this.Joined.updateEach(h=>h.id === hunter_id ? h.updateQuest(quest) : h);
+        this.StandBy.updateEach(h=>h.id === hunter_id ? h.updateQuest(quest) : h);
         return this.toJson();
     }
 

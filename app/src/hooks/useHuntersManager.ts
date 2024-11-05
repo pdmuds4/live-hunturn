@@ -57,8 +57,24 @@ export default function useHuntersManager(data: YoutubeLiveApi.GETresponse) {
         console.log(hunters);
     }
 
+    function updateQuestHandler(hunter_id: string, quest: number) {
+        setHunters({
+            host: hunters.host,
+            ...factory.updateHunterQuest(hunter_id, quest)
+        });
+    }
+
+    function deleteHunterHandler(hunter_id: string) {
+        setHunters({
+            host: hunters.host,
+            ...factory.leaveHunter(hunter_id)
+        });
+    }
+
     return {
         hunters,
-        questDoneHandler
+        questDoneHandler,
+        updateQuestHandler,
+        deleteHunterHandler
     };
 }
