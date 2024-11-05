@@ -54,7 +54,7 @@ export default class HunterFactory {
                 });
                 this.changeHunter(must_change_hunter.id, entity);
             } else {
-                const compair_hunter_quest= this.Joined.findByIndex(this.StandBy.length % 3).quest;
+                const compair_hunter_quest = this.Joined.orderByDes()[this.StandBy.length % 3].quest;
                 const entity_quest = 2 - compair_hunter_quest + Math.floor(this.StandBy.length / 3) * 2;
                 const entity = new HunterEntity({
                     ...info,

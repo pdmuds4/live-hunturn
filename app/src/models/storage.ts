@@ -11,6 +11,10 @@ export default class HunterStorage {
         return this.storage.some(h=>h.id === id)
     }
 
+    orderByDes() {
+        return this.storage.sort((a, b) => b.quest - a.quest);
+    }
+
     findById(id: string) {
         return this.storage.find(h=>h.id === id)
     }
