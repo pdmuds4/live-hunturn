@@ -30,17 +30,6 @@ export default class HunterFactory {
             this.StandBy.checkById(info.id)
         ) return this.toJson();
 
-        if (this.JustLeft.checkById(info.id)) {
-            const compair_hunter_quest = this.Joined.orderByDes()[this.StandBy.length % 3].quest;
-            const entity_quest = 2 - compair_hunter_quest + Math.floor(this.StandBy.length / 3);
-            const entity = new HunterEntity({
-                ...info,
-                quest: entity_quest < 2 ? 2 : entity_quest
-            });
-            
-            this.StandBy.insert(entity);
-        }
-
         if (this.Joined.length < 3) {
             const entity = new HunterEntity({
                 ...info,
