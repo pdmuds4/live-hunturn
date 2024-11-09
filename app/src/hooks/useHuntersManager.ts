@@ -41,7 +41,7 @@ export default function useHuntersManager(data: YoutubeLiveApi.GETresponse) {
                 })
                 setIntervalTime(10000);
             } else {
-                setIntervalTime(interval_time < 20000 ? interval_time*1.1 : 20000);
+                setIntervalTime(interval_time < 30000 ? interval_time*1.2 : 30000);
             }
             setNextPageToken(response.page_token);
         } catch (error) {
