@@ -39,6 +39,7 @@ export default class HunterFactory {
             });
             
             this.StandBy.insert(entity);
+            return this.toJson();
         }
 
         if (this.Joined.length < 3) {
