@@ -21,7 +21,7 @@ export const loader = (args: LoaderFunctionArgs) => apiHandler(
 
 export default function Live() {
     const data = useLoaderData<YoutubeLiveApi.GETresponse>();
-    const { hunters, questDoneHandler, updateQuestHandler, deleteHunterHandler } = useHuntersManager(data);
+    const { hunters, questDoneHandler } = useHuntersManager(data, false);
 
     return (
         <Flex className="w-screen h-screen justify-center">

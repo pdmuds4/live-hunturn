@@ -15,12 +15,12 @@ export const loader = (args: LoaderFunctionArgs) => apiHandler(
     args,
     async ({ request }) => {
         const param = new URL(request.url).searchParams;
-        const liveID = param.get('live_id');
+        const live_id = param.get('live_id');
 
-        if (liveID) {
+        if (live_id) {
             const video_response = await client.videos.list(
                 { 
-                    id: [liveID], 
+                    id: [live_id], 
                     part: ['snippet', 'liveStreamingDetails']
                 }
             );
@@ -49,7 +49,7 @@ export const loader = (args: LoaderFunctionArgs) => apiHandler(
                     avator: channel_info!.snippet!.thumbnails!.default!.url as string
                 }
 
-                return json({ host, chat_id }) as TypedResponse<YoutubeLiveApi.GETresponse>;
+                return json({ host, live_id, chat_id }) as TypedResponse<YoutubeLiveApi.GETresponse>;
             } else {
                 throw new ServerError(
                     'この動画はライブ配信コンテンツではありません',
