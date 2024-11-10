@@ -8,6 +8,7 @@ export type GETresponse = {
         name: string;
         avator: string;
     }
+    live_id: string;
     chat_id: string | null;
 }
 
