@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 import { HunterFactory, HunterStorage } from '../models';
-import { YoutubeLiveApi } from '~/src/types';
+import { LiveChatApi, YoutubeLiveApi } from '~/src/types';
 
 const factory = new HunterFactory(new HunterStorage(), new HunterStorage());
 export default function useHuntersManager(data: YoutubeLiveApi.GETresponse, youtubeDataApi: boolean) {
@@ -11,6 +11,7 @@ export default function useHuntersManager(data: YoutubeLiveApi.GETresponse, yout
         ...factory.toJson()
     });
     const [next_page_token, setNextPageToken] = useState<string|null>(null);
+    const [next_chat_token, setNextChatToken] = useState<string|null>(null);
     const [interval_time, setIntervalTime] = useState<number>(20000);
 
     useEffect(()=>{
@@ -46,8 +47,8 @@ export default function useHuntersManager(data: YoutubeLiveApi.GETresponse, yout
                 }
                 setNextPageToken(response.page_token);
             } else {
-                const res = await axios.get(`/api/live-chat?live_id=${data.live_id}`);
-                const response = res.data as YoutubeLiveApi.POSTresponse;
+                const res = await axios.get(`/api/live-chat?live_id=${data.live_id}&chat_token=${next_chat_token}`);
+                const response = res.data as LiveChatApi.GETresponse;
                 console.log(response);
 
                 if (response.query && response.query.length) {
@@ -61,6 +62,7 @@ export default function useHuntersManager(data: YoutubeLiveApi.GETresponse, yout
                 } else {
                     setIntervalTime(interval_time < 20000 ? interval_time*1.1 : 30000);
                 }
+                setNextChatToken(response.chat_token);
             }
         } catch (error) {
             console.error(error);
