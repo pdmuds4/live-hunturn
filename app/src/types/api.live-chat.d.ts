@@ -13,4 +13,5 @@ export type GETresponse = {
         },
         request: string,
     }[] | null;
+    chat_token: string;
 }
