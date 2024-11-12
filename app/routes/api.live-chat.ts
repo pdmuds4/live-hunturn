@@ -21,9 +21,10 @@ export const loader = (args: LoaderFunctionArgs) => apiHandler(
             const browser = await puppeteer.launch({
                 headless: false,
                 args: [
-                    '--window-position=-1000,-1000',  // 画面外に配置
-                    '--disable-gpu', // GPU使用を無効にする
-                    '--disable-software-rasterizer'  // ソフトウェアレンダリングを無効にする
+                    '--window-position=-1000,-1000',
+                    '--disable-gpu',
+                    '--disable-software-rasterizer',
+                    '--window-size=200,200'  // ウィンドウサイズを指定
                 ]
             });
             const page = await browser.newPage();
@@ -72,7 +73,9 @@ export const loader = (args: LoaderFunctionArgs) => apiHandler(
                     query: query.length ? query: null,
                     chat_token: last_chat_id
                 }) as TypedResponse<LiveChatApi.GETresponse>;
-            } finally {
+            } catch(e){
+                return json({ query: null, chat_token }) as TypedResponse<LiveChatApi.GETresponse>;
+            }finally {
                 await browser.close();
             }
         } else {
