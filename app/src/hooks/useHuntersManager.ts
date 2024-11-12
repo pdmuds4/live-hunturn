@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 import { HunterFactory, HunterStorage } from '../models';
 import { LiveChatApi, YoutubeLiveApi } from '~/src/types';
@@ -65,7 +65,7 @@ export default function useHuntersManager(data: YoutubeLiveApi.GETresponse, yout
                 setNextChatToken(response.chat_token);
             }
         } catch (error) {
-            console.error(error);
+            error instanceof AxiosError ? console.error(error.response?.data) : console.error(error);
         }
     }
 
