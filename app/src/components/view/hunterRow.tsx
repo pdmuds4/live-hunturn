@@ -34,7 +34,7 @@ export default function HunterRow(props: Props) {
                 h={5}
                 onDoubleClick={deleteHunterHandler}
             />
-            <Text fontSize='12px'>{props.name}</Text>
+            <Text className="min-w-24 whitespace-nowrap text-ellipsis overflow-hidden" fontSize='12px'>{props.name}</Text>
             <Stack className="ml-auto" direction='row' alignItems='end' gap={1}>
             {
                 props.is_owner ? 

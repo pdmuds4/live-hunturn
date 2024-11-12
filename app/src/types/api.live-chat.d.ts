@@ -3,21 +3,6 @@ export type GETrequest = {
 }
 
 export type GETresponse = {
-    host: {
-        id: string;
-        name: string;
-        avator: string;
-    }
-    live_id: string;
-    chat_id: string | null;
-}
-
-export type POSTrequest = {
-    chat_id: string;
-    page_token: string | null;
-}
-
-export type POSTresponse = {
     query : {
         user_info: {
             id: string;
@@ -28,5 +13,5 @@ export type POSTresponse = {
         },
         request: string,
     }[] | null;
-    page_token: string | null;
+    chat_token: string;
 }

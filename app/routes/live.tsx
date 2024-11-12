@@ -21,7 +21,7 @@ export const loader = (args: LoaderFunctionArgs) => apiHandler(
 
 export default function Live() {
     const data = useLoaderData<YoutubeLiveApi.GETresponse>();
-    const { hunters, questDoneHandler, updateQuestHandler, deleteHunterHandler } = useHuntersManager(data);
+    const { hunters, questDoneHandler, updateQuestHandler, deleteHunterHandler } = useHuntersManager(data, true);
 
     return (
         <Flex className="w-screen h-screen justify-center">
@@ -47,8 +47,8 @@ export default function Live() {
                     </Flex>
                 </Card>
                 <Flex className="text-white p-1 h-full" direction='column'>
-                    <UiButton onClick={questDoneHandler}>
-                        クエスト終了
+                    <UiButton className="h-6 text-xs" onClick={questDoneHandler}>
+                        待機中：{hunters.StandBy.length}人
                     </UiButton>
                     { hunters.StandBy.map((standby, index) =>  (
                         <ViewHunterRow 

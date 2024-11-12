@@ -19,7 +19,7 @@ export default function Index() {
             setUserInfo(res.data);
         })
         .catch(err => {
-            alert(err.response.data.replace('Unexpected Server Error\n\n', ''));
+            console.error(err.response.data);
             navigate('/login');
         });
     // eslint-disable-next-line react-hooks/exhaustive-deps
