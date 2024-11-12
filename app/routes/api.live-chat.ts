@@ -21,7 +21,7 @@ export const loader = (args: LoaderFunctionArgs) => apiHandler(
             const browser = await puppeteer.launch({
                 headless: false,
                 args: [
-                    '--window-position=-1000,-1000',
+                    '--window-position=-2000,-2000',
                     '--disable-gpu',
                     '--disable-software-rasterizer',
                     '--window-size=200,200'  // ウィンドウサイズを指定
