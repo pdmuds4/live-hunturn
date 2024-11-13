@@ -3,7 +3,7 @@ import apiHandler from "~/src/utils/apiHandler";
 import ServerError from "~/src/utils/serverError";
 
 import { LiveChatApi } from "~/src/types";
-import puppeteer from "puppeteer";
+import { chromium } from "playwright-core";
 
 import CommandProcessor from "~/src/client/command";
 import command_parser from "~/src/command";
@@ -18,9 +18,11 @@ export const loader = (args: LoaderFunctionArgs) => apiHandler(
         const chat_token = param.get('chat_token');
 
         if (live_id) {
-            const browser = await puppeteer.launch({
+            const browser = await chromium.launch({
+                channel: 'chrome',
                 headless: false,
                 args: [
+                    "--disable-remote-fonts",
                     '--window-position=-1000,-1000',
                     '--disable-gpu',
                     '--disable-software-rasterizer',
@@ -30,7 +32,7 @@ export const loader = (args: LoaderFunctionArgs) => apiHandler(
             const page = await browser.newPage();
 
             try {
-                await page.goto(`https://www.youtube.com/live_chat?is_popout=1&v=${live_id}`, { waitUntil: 'networkidle2' });
+                await page.goto(`https://www.youtube.com/live_chat?is_popout=1&v=${live_id}`);
                 await page.waitForSelector('yt-live-chat-text-message-renderer');
                 
                 const chat_infos = await page.$$eval('yt-live-chat-text-message-renderer', (elements) => {
@@ -73,9 +75,7 @@ export const loader = (args: LoaderFunctionArgs) => apiHandler(
                     query: query.length ? query: null,
                     chat_token: last_chat_id
                 }) as TypedResponse<LiveChatApi.GETresponse>;
-            } catch(e){
-                return json({ query: null, chat_token }) as TypedResponse<LiveChatApi.GETresponse>;
-            }finally {
+            } finally {
                 await browser.close();
             }
         } else {
