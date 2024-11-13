@@ -34,7 +34,7 @@ export default function HunterRow(props: Props) {
                 h={5}
                 onDoubleClick={deleteHunterHandler}
             />
-            <Text className="min-w-24 whitespace-nowrap text-ellipsis overflow-hidden" fontSize='12px'>{props.name}</Text>
+            <Text className="min-w-12 w-1/2 whitespace-nowrap text-ellipsis overflow-hidden" fontSize='12px'>{props.name}</Text>
             <Stack className="ml-auto" direction='row' alignItems='end' gap={1}>
             {
                 props.is_owner ? 
@@ -64,17 +64,18 @@ export default function HunterRow(props: Props) {
                         h={8}
                         hidden={!toggle_input}
                     />
-                    <Text color={props.quest >= 2 ? '#5ff773' : 'white'} fontSize='10px'>Quest</Text> 
+                    <Text color={props.quest >= 2 ? '#5ff773' : 'white'} fontSize='10px'>クエ</Text> 
                 </>           
             ) : (
-                <>
+                <>  
+                    <Text color='#f7d95f' fontSize='10px'>あと</Text> 
                     <Text
                         className="cursor-pointer"
                         color='#f6d346'
                         onDoubleClick={()=>setToggleInput(!toggle_input)}
                         hidden={toggle_input}
                     >
-                        あと{props.quest}
+                        {props.quest}
                     </Text>
                     <Input
                         type="number"
@@ -85,7 +86,7 @@ export default function HunterRow(props: Props) {
                         h={8}
                         hidden={!toggle_input}
                     />
-                    <Text color='#f7d95f' fontSize='10px'>Quest</Text> 
+                    <Text color='#f7d95f' fontSize='10px'>クエ</Text> 
                 </>
             )
             }
