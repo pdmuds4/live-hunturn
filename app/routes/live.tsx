@@ -15,13 +15,14 @@ export const loader = (args: LoaderFunctionArgs) => apiHandler(
     async ({ request }) => {
         const live_id = new URL(request.url).searchParams.get('v');
         const response = await axios.get(`/api/youtube-live?live_id=${live_id}`);
+
         return json(response.data);
     }
 )
 
 export default function Live() {
     const data = useLoaderData<YoutubeLiveApi.GETresponse>();
-    const { hunters, questDoneHandler, updateQuestHandler, deleteHunterHandler } = useHuntersManager(data, true);
+    const { hunters, questDoneHandler, updateQuestHandler, deleteHunterHandler } = useHuntersManager(data, import.meta.env.VITE_YOUTUBE_API_MODE === 'true');
 
     return (
         <Flex className="w-screen h-screen justify-center">
