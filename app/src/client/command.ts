@@ -6,11 +6,11 @@ export default class CommandProcessor {
     }
 
     recognizer(message: string): boolean {
-        return Object.keys(this.parser).some((key) => this.parser[key].includes(message));
+        return Object.keys(this.parser).some((key) => this.parser[key].some((word) => message.includes(word)));
     }
 
     toRequest(message: string): string {
-        const command = Object.keys(this.parser).find((key) => this.parser[key].includes(message));
+        const command = Object.keys(this.parser).find((key) => this.parser[key].some((word) => message.includes(word)));
         return command ? command : '';
     }
 }
