@@ -25,7 +25,7 @@ export default function useHuntersManager(data: YoutubeLiveApi.GETresponse) {
 
     async function watcher() {
         try {
-            const res = await axios.get(`/api/live-chat?live_id=${data.live_id}&chat_token=${next_chat_token}`);
+            const res = await axios.get(`/api/youtube-live?live_id=${data.live_id}&chat_token=${next_chat_token}`);
             const response = res.data as LiveChatApi.GETresponse;
             console.log(response);
 
