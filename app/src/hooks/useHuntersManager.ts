@@ -5,12 +5,11 @@ import { HunterFactory, HunterStorage } from '../models';
 import { LiveChatApi, YoutubeLiveApi } from '~/src/types';
 
 const factory = new HunterFactory(new HunterStorage(), new HunterStorage());
-export default function useHuntersManager(data: YoutubeLiveApi.GETresponse, youtubeDataApi: boolean) {
+export default function useHuntersManager(data: YoutubeLiveApi.GETresponse) {
     const [hunters, setHunters] = useState({
         host: data.host,
         ...factory.toJson()
     });
-    const [next_page_token, setNextPageToken] = useState<string|null>(null);
     const [next_chat_token, setNextChatToken] = useState<string|null>(null);
     const [interval_time, setIntervalTime] = useState<number>(20000);
 
@@ -26,44 +25,22 @@ export default function useHuntersManager(data: YoutubeLiveApi.GETresponse, yout
 
     async function watcher() {
         try {
-            if (youtubeDataApi) {
-                const res = await axios.post('/api/youtube-live', {
-                    chat_id: data.chat_id,
-                    page_token: next_page_token
-                });
-                const response = res.data as YoutubeLiveApi.POSTresponse;
-                console.log(response);
+            const res = await axios.get(`/api/youtube-live?live_id=${data.live_id}&chat_token=${next_chat_token}`);
+            const response = res.data as LiveChatApi.GETresponse;
+            console.log(response);
 
-                if (response.query && response.query.length) {
-                    response.query.forEach(query => {
-                        setHunters({
-                            ...hunters,
-                            ...factory.queryParser(query)
-                        })
+            if (response.query && response.query.length) {
+                response.query.forEach(query => {
+                    setHunters({
+                        ...hunters,
+                        ...factory.queryParser(query)
                     })
-                    setIntervalTime(20000);
-                } else {
-                    setIntervalTime(interval_time < 20000 ? interval_time*1.1 : 30000);
-                }
-                setNextPageToken(response.page_token);
+                })
+                setIntervalTime(20000);
             } else {
-                const res = await axios.get(`/api/live-chat?live_id=${data.live_id}&chat_token=${next_chat_token}`);
-                const response = res.data as LiveChatApi.GETresponse;
-                console.log(response);
-
-                if (response.query && response.query.length) {
-                    response.query.forEach(query => {
-                        setHunters({
-                            ...hunters,
-                            ...factory.queryParser(query)
-                        })
-                    })
-                    setIntervalTime(20000);
-                } else {
-                    setIntervalTime(interval_time < 20000 ? interval_time*1.1 : 30000);
-                }
-                setNextChatToken(response.chat_token);
+                setIntervalTime(interval_time < 20000 ? interval_time*1.1 : 30000);
             }
+            setNextChatToken(response.chat_token);
         } catch (error) {
             error instanceof AxiosError ? console.error(error.response?.data) : console.error(error);
         }
