@@ -1,48 +1,24 @@
-import axios from "axios";
 import { useNavigate } from "@remix-run/react";
-import { useEffect, useState } from "react";
-import { Text, Box, Image, Stack, Icon, Input } from "@chakra-ui/react";
+import { useState } from "react";
+import { Text, Image, Stack, Icon, Input } from "@chakra-ui/react";
 import { MdOutlineLiveTv } from "react-icons/md";
 
-import { ViewHomeLayout, UiButton, ProviderAuth } from "~/src/components";
-import { GoogleUserApi } from "~/src/types";
+import { ViewHomeLayout, UiButton } from "~/src/components";
 
 export default function Index() {
     const navigate = useNavigate();
 
-    const [userInfo, setUserInfo] = useState<GoogleUserApi.GETresponse|null>(null);
     const [liveID, setLiveID] = useState<string>('');
-
-    useEffect(() => {
-        axios.get('/api/google-user')
-        .then((res) => {
-            setUserInfo(res.data);
-        })
-        .catch(err => {
-            console.error(err.response.data);
-            navigate('/login');
-        });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     return (
-        <ProviderAuth>
+        <>
             <ViewHomeLayout>
-                <Text fontSize='min(12vw, 32px)'>
-                    Go Live !
-                </Text>
-                <Box className="text-center">
-                    <Image 
-                        className="shadow-md"
-                        src={userInfo?.picture}
-                        alt="youtube account avatar"
-                        maxW={100}
-                        borderRadius='full'
-                    />
-                    <Text fontSize='min(8vw, 32px)'>
-                        {userInfo?.name}
-                    </Text>
-                </Box>
+                <Image
+                    className="w-4/12"
+                    src='/img/logo.svg' 
+                    alt='Live Hunturn Logo'
+                    minW={100}
+                />
+                <Text fontSize='min(12vw, 32px)' as='ins'>Live Hunturn</Text>
                 <Stack>
                     <Input 
                         placeholder="配信IDを入力"
@@ -63,6 +39,6 @@ export default function Index() {
                     </UiButton>
                 </Stack>
             </ViewHomeLayout>
-        </ProviderAuth>
+        </>
     );
 }
