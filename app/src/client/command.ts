@@ -5,8 +5,8 @@ export default class CommandProcessor {
         this.parser = command_parser;
     }
 
-    recognizer(message: string): boolean {
-        return Object.keys(this.parser).some((key) => this.parser[key].some((word) => message.includes(word)));
+    recognizer(message: string | undefined): boolean {
+        return Object.keys(this.parser).some((key) => this.parser[key].some((word) => message ? message.includes(word) : false));
     }
 
     toRequest(message: string): string {
